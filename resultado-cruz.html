@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Resultado — Protocolo Cruz Maya</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@100;300;400&family=Space+Mono&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        :root { --black: #0A0A0A; --white: #FFFFFF; --grey-zone: #EAEAEA; --accent: #2E8B57; --font-serif: 'Playfair Display', serif; --font-mono: 'Space Mono', monospace; --font-sans: 'Inter', sans-serif; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: var(--font-sans); background-color: var(--white); color: var(--black); line-height: 1.5; }
+        header { padding: 40px; text-align: center; border-bottom: 1px solid #eee; }
+        .logo-header { width: 140px; height: auto; cursor: pointer; }
+        .hero-title { text-align: center; padding: 40px 20px; border-bottom: 1px solid #eee; }
+        .hero-title h1 { font-family: var(--font-serif); font-size: 2.5rem; font-weight: 400; }
+        .hero-title h1 i { color: var(--accent); font-style: italic; }
+        .main-wrapper { max-width: 1100px; margin: 50px auto; display: grid; grid-template-columns: 1fr 1fr; gap: 80px; padding: 0 20px; align-items: center; }
+        #area-pdf { background: #fff; padding: 20px; display: flex; justify-content: center; align-items: flex-start; }
+        .grid-cruz { display: grid !important; grid-template-columns: repeat(5, 75px) !important; gap: 10px !important; justify-content: center; }
+        .nawal-item { background: white; border: 1.5px solid var(--black); aspect-ratio: 1/1; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; }
+        .nawal-item:hover { background: #f9f9f9; }
+        .item-center { border: 3px solid var(--black); }
+        .nawal-img { width: 45px; height: 45px; object-fit: contain; }
+        .nawal-label { font-family: var(--font-mono); font-size: 0.55rem; text-transform: uppercase; margin-top: 4px; color: #666; }
+        .nawal-num { font-family: var(--font-mono); font-weight: bold; font-size: 0.85rem; }
+        .info-panel h3 { font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 3px; color: var(--accent); margin-bottom: 25px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
+        #textoLectura { font-size: 1.05rem; text-align: justify; color: #333; line-height: 1.8; }
+        #trecenaContainer { margin-top: 40px; background-color: #F5F5F5; padding: 35px; border-left: 4px solid var(--accent); font-family: var(--font-serif); box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        .trecena-title { display: block; color: var(--accent); font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 15px; font-weight: bold; }
+        .trecena-text { font-size: 1.05rem; line-height: 1.8; color: #222; font-style: italic; margin-bottom: 20px; }
+        .shop-link { display: block; margin-top: 10px; font-size: 0.7rem; color: var(--accent); text-decoration: none; border-bottom: 1px solid var(--accent); width: fit-content; transition: all 0.3s; font-family: var(--font-mono); letter-spacing: 1px; }
+        #seccion-narrativa { max-width: 800px; margin: 0 auto 60px; padding: 0 20px; display: none; }
+        #seccion-narrativa h2 { font-family: var(--font-serif); font-size: 1.8rem; font-weight: 400; margin-bottom: 10px; text-align: center; }
+        .narrativa-subtitulo { text-align: center; font-family: var(--font-mono); font-size: 0.65rem; letter-spacing: 3px; color: var(--accent); text-transform: uppercase; margin-bottom: 40px; }
+        #texto-narrativa-ia { font-size: 1.05rem; line-height: 1.9; color: #222; text-align: justify; white-space: pre-wrap; }
+        #texto-narrativa-ia p { margin-bottom: 1.4em; }
+        #estado-generacion { text-align: center; padding: 40px; font-family: var(--font-mono); font-size: 0.75rem; letter-spacing: 2px; color: var(--accent); }
+        .spinner { display: inline-block; width: 20px; height: 20px; border: 2px solid #eee; border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; margin-right: 10px; vertical-align: middle; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .gray-strip { background: var(--grey-zone); padding: 80px 20px; margin-top: 80px; text-align: center; }
+        .strip-content { max-width: 800px; margin: 0 auto; }
+        .strip-content h2 { font-family: var(--font-serif); font-size: 2rem; margin-bottom: 20px; font-weight: 400; }
+        .strip-content p { font-size: 1.15rem; line-height: 1.8; color: #444; margin-bottom: 40px; text-align: center; font-style: italic; }
+        .btn-container { display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; }
+        .btn-pdf { background: var(--black); color: white; border: none; padding: 18px 40px; font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 2px; cursor: pointer; transition: opacity 0.3s; }
+        .btn-pdf:hover { opacity: 0.8; }
+        .btn-pdf:disabled { opacity: 0.4; cursor: not-allowed; }
+        .btn-learn { background: transparent; color: var(--black); border: 1px solid var(--black); padding: 18px 40px; font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 2px; cursor: pointer; transition: all 0.3s; text-decoration: none; display: inline-block; }
+        .btn-learn:hover { background: var(--black); color: white; }
+        footer { padding: 60px; text-align: center; font-family: var(--font-mono); font-size: 0.6rem; opacity: 0.4; border-top: 1px solid #eee; }
+        .badge { background: var(--accent); color: white; font-family: var(--font-mono); font-size: 0.7rem; padding: 4px 12px; border-radius: 30px; display: inline-block; margin-bottom: 15px; letter-spacing: 1px; }
+        .error-message { background: #f8d7da; color: #721c24; padding: 20px; border-radius: 10px; margin: 40px auto; max-width: 600px; text-align: center; font-family: var(--font-mono); font-size: 0.9rem; }
+        @media (max-width: 850px) { .main-wrapper { grid-template-columns: 1fr; gap: 40px; align-items: start; } .grid-cruz { grid-template-columns: repeat(5, 60px) !important; } .hero-title h1 { font-size: 2rem; } .btn-container { flex-direction: column; align-items: center; } .btn-pdf, .btn-learn { width: 100%; } }
+    </style>
+</head>
+<body>
+<header><img src="img/logo.png" class="logo-header" onclick="window.location.href='index.html'"></header>
+<div class="hero-title">
+    <h1 id="titulo-resultado">Matriz de <i>Esencia</i></h1>
+    <div id="modo-badge" style="margin-top: 15px;"></div>
+</div>
+<div id="estado-generacion" style="display: none;"><span class="spinner"></span> PROCESANDO...</div>
+<div id="error-container" style="display: none;" class="error-message"></div>
+<div id="contenido-principal" style="display: none;">
+    <div class="main-wrapper">
+        <div id="area-pdf"><div id="cruzGrid" class="grid-cruz"></div></div>
+        <div class="info-panel">
+            <h3>DIAGNÓSTICO ESTRUCTURAL</h3>
+            <div id="textoLectura">Seleccione un nahual para iniciar la auditoría...</div>
+            <div id="trecenaContainer"></div>
+        </div>
+    </div>
+    <div id="seccion-narrativa">
+        <h2>Tu Estructura de Conciencia</h2>
+        <div class="narrativa-subtitulo">ANÁLISIS GENERADO POR INTELIGENCIA ARTIFICIAL · PROTOCOLO CRUZ MAYA</div>
+        <div id="texto-narrativa-ia"></div>
+    </div>
+    <div class="gray-strip">
+        <div class="strip-content">
+            <h2>El Plano Maestro Inconsciente</h2>
+            <p>Has tomado el primer paso hacia la decodificación. Comprender tu diseño es liberar las tensiones que dictan tu realidad física, emocional y financiera.</p>
+            <div class="btn-container">
+                <button type="button" class="btn-pdf" id="btn-descargar" onclick="event.preventDefault();generarPDF()" disabled>GENERANDO REPORTE...</button>
+                <a href="aprender.html" class="btn-learn">COMPRENDER LA PROFUNDIDAD</a>
+            </div>
+        </div>
+    </div>
+</div>
+<footer>PROTOCOLO CRUZ MAYA &copy; 2026</footer>
+
+<script src="narrativas/textos.js"></script>
+<script>
+// ============================================================
+// TRES API KEYS — ROTACIÓN AUTOMÁTICA
+// Carga aquí las tres claves de Google AI Studio
+// ============================================================
+const GEMINI_KEYS = [
+    "AIzaSyCHLXtX8rhDdk07C62HSgEnSvvroy4vDmA",
+    "AIzaSyBiUDoiqGsltXfRnFL2tZafl-8T4okTVlg",
+    "AIzaSyCQp1snu91egLA9oCUrENnJGYaePiUvpdQ"
+];
+let _keyIdx = 0;
+function getKey(){ return GEMINI_KEYS[_keyIdx++ % GEMINI_KEYS.length]; }
+
+const modoIA = new URLSearchParams(window.location.search).get('modo') || 'gratis';
+let tipoCruz = new URLSearchParams(window.location.search).get('tipo') || 'esencia';
+if (tipoCruz === 'salud') tipoCruz = 'esencia';
+if (tipoCruz === 'linaje') tipoCruz = 'familia';
+
+const badgeDiv = document.getElementById('modo-badge');
+if (modoIA === 'pago') { badgeDiv.innerHTML = '<span class="badge">🔮 ANÁLISIS COMPLETO (PAGO)</span>'; } 
+else { badgeDiv.innerHTML = '<span class="badge" style="background: #777;">📖 ANÁLISIS GRATUITO</span>'; }
+
+const posicionesCriticas = { pareja: [6, 5, 10, 12, 4, 2], negocios: [7, 0, 11, 1, 6, 8], familia: [10, 12, 9, 11, 6, 3], esencia: [6, 3, 2, 12, 4, 10] };
+const nombresPos = ["Comunicación","Creatividad","Futuro","Concepción","Salud","Fuerza Femenina","ESENCIA","Fuerza Masculina","Protección","Instinto","Pasado","Justicia","Sombra"];
+
+// ============================================================
+// MOTOR DE CÁLCULO
+// ============================================================
+const nawalesConAp = ["Imox","Iq'","Aq'ab'al","K'at","Kan","Kame","Kej","Q'anil","Toj","Tz'i'","B'atz'","E'","Aj","I'x","Tz'ikin","Ajmaq","N'oj","Tijax","Kawoq","Ajpu'"];
+const nawalesSinAp = ["Imox","IQ","AKBAL","KAT","kan","Kame","Kej","Qanil","Toj","Tzi","Batz","E","Aj","Ix","Tzikin","Ajmaq","Noj","Tijax","Kawoq","Ajpu"];
+const convertir = {}; for (let i = 0; i < nawalesConAp.length; i++) { convertir[nawalesConAp[i]] = nawalesSinAp[i]; }
+const cruces = {"Imox":["N'oj","Tz'ikin","Toj","Aq'ab'al","Aj","Kej","Imox","Tz'ikin","Toj","Kawoq","Aj","Kej","Kan"],"Iq'":["Tijax","Ajmaq","Tz'i'","Kat","I'x","Qanil","Iq'","Ajmaq","Tz'i'","Ajpu","I'x","Qanil","Kame"],"Aq'ab'al":["Kawoq","N'oj","B'atz'","Kan","Tz'ikin","Toj","Aq'ab'al","N'oj","B'atz'","Imox","Tz'ikin","Toj","Kej"],"K'at":["Ajpu'","Tijax","E'","Kame","Ajmaq","Tz'i'","K'at","Tijax","E'","Iq'","Ajmaq","Tz'i'","Qanil"],"Kan":["Imox","Kawoq","Aj","Kej","N'oj","B'atz'","Kan","Kawoq","Aj","Aq'ab'al","N'oj","B'atz'","Toj"],"Kame":["Iq'","Ajpu'","I'x","Qanil","Tijax","E'","Kame","Ajpu'","I'x","Kat","Tijax","E'","Tz'i'"],"Kej":["Aq'ab'al","Imox","Tz'ikin","Toj","Kawoq","Aj","Kej","Imox","Tz'ikin","Kan","Kawoq","Aj","B'atz'"],"Q'anil":["Kat","Iq'","Ajmaq","Tz'i'","Ajpu'","I'x","Q'anil","Iq'","Ajmaq","Kame","Ajpu'","I'x","E'"],"Toj":["Kan","Aq'ab'al","N'oj","B'atz'","Imox","Tz'ikin","Toj","Aq'ab'al","N'oj","Kej","Imox","Tz'ikin","Aj"],"Tz'i'":["Kame","Kat","Tijax","E'","Iq'","Ajmaq","Tz'i'","Kat","Tijax","Qanil","Iq'","Ajmaq","I'x"],"B'atz'":["Kej","Kan","Kawoq","Aj","Aq'ab'al","N'oj","B'atz'","Kan","Kawoq","Toj","Aq'ab'al","N'oj","Tz'ikin"],"E'":["Qanil","Kame","Ajpu'","I'x","Kat","Tijax","E'","Kame","Ajpu'","Tz'i'","Kat","Tijax","Ajmaq"],"Aj":["Toj","Kej","Imox","Tz'ikin","Kan","Kawoq","Aj","Kej","Imox","B'atz'","Kan","Kawoq","N'oj"],"I'x":["Tz'i'","Qanil","Iq'","Ajmaq","Kame","Ajpu'","I'x","Qanil","Iq'","E'","Kame","Ajpu'","Tijax"],"Tz'ikin":["B'atz'","Toj","Aq'ab'al","N'oj","Kej","Imox","Tz'ikin","Toj","Aq'ab'al","Aj","Kej","Imox","Kawoq"],"Ajmaq":["E'","Tz'i'","Kat","Tijax","Qanil","Iq'","Ajmaq","Tz'i'","Kat","I'x","Qanil","Iq'","Ajpu'"],"N'oj":["Aj","B'atz'","Kan","Kawoq","Toj","Aq'ab'al","N'oj","B'atz'","Kan","Tz'ikin","Toj","Aq'ab'al","Imox"],"Tijax":["I'x","E'","Kame","Ajpu'","Tz'i'","Kat","Tijax","E'","Kame","Ajmaq","Tz'i'","Kat","Iq'"],"Kawoq":["Tz'ikin","Aj","Kej","Imox","B'atz'","Kan","Kawoq","Aj","Kej","N'oj","B'atz'","Kan","Aq'ab'al"],"Ajpu'":["Ajmaq","I'x","Qanil","Iq'","E'","Kame","Ajpu'","I'x","Qanil","Tijax","E'","Kame","Kat"]};
+const numerosBase = [4, 2, 9, 3, 13, 7, 1, 8, 2, 12, 6, 13, 11];
+const mapVisualToNarrativa = [8, 9, 2, 5, 7, 4, 0, 3, 6, 12, 1, 11, 10];
+const coordenadas = { 0: { row: 0, col: 2 }, 1: { row: 1, col: 1 }, 2: { row: 1, col: 2 }, 3: { row: 1, col: 3 }, 4: { row: 2, col: 0 }, 5: { row: 2, col: 1 }, 6: { row: 2, col: 2 }, 7: { row: 2, col: 3 }, 8: { row: 2, col: 4 }, 9: { row: 3, col: 1 }, 10: { row: 3, col: 2 }, 11: { row: 3, col: 3 }, 12: { row: 4, col: 2 } };
+
+function gregorianToJDN(d,m,y){let a=Math.floor((14-m)/12),yy=y+4800-a,mm=m+12*a-3;return d+Math.floor((153*mm+2)/5)+365*yy+Math.floor(yy/4)-Math.floor(yy/100)+Math.floor(yy/400)-32045;}
+function calcularCentro(d,m,y){const diff=gregorianToJDN(d,m,y)-gregorianToJDN(30,12,1961);let i=((diff%20)+20)%20,t=((diff%13)+13)%13+1;return{nawalConAp:nawalesConAp[i],nawalSinAp:nawalesSinAp[i],tono:t,idx:i};}
+function generarCruz(c){const lC=cruces[c.nawalConAp];if(!lC)return[];const lS=lC.map(n=>convertir[n]||n),aj=(c.tono-1+13)%13,r=[];for(let i=0;i<13;i++){let t=(numerosBase[i]+aj)%13;if(t===0)t=13;r.push({nawal:lS[i],tono:t,posIndex:i,posNombre:nombresPos[i]});}return r;}
+
+// ============================================================
+// TRECENAS ELEGANTES
+// ============================================================
+const trecenasElegantes = {
+    "Imox": "La Trecena de Imox te sitúa en el útero cósmico y el mar mental. Si no haces consciente lo que habita en tus aguas profundas, el destino traerá naufragios para obligarte a aprender a nadar. Arquitectónicamente, nacer bajo esta frecuencia es habitar un terreno con napas freáticas altas: si no impermeabilizas tu mente con límites claros, tu estructura emocional se hundirá. Nadar en aguas estancadas enferma el cuerpo; si tus emociones no fluyen, se convierten en síntomas físicos. Debes limpiar el útero emocional para dejar de gestar proyectos que nacen muertos por lealtades invisibles.",
+    "Iq'": "La Trecena de Iq' rige el aliento, la palabra y el espíritu del cambio. Lo que callas hoy se convertirá en un síntoma mañana; tu palabra es el pincel de tu realidad biológica. Tu diseño es aerodinámico, hecho para el flujo. Si te estancas en ideas rígidas, la presión del estrés derribará tus muros. El viento se lleva lo que no tiene raíz; si tus creencias son prestadas, cualquier ráfaga de crisis te derribará.",
+    "Aq'ab'al": "La Trecena de Aq'ab'al es el umbral donde la luz y la sombra se encuentran. Para que el sol salga en tu vida, debes aceptar la oscuridad que aún guardas en el sótano. Eres una estructura de transición constante, renovando la fachada de lo que fuiste. El amanecer no es el fin de la noche, es la integración de tu sombra. Aprender a convivir con el escombro del pasado es tu mayor fortaleza.",
+    "K'at": "La Trecena de K'at habla de redes, abundancia y las ataduras invisibles. Tus bloqueos no son falta de suerte, sino una red de lealtades familiares que impiden prosperar para no superar a tus antepasados. Tu terreno es fértil pero lleno de maleza: requiere una limpieza profunda de creencias antes de sembrar. Para que la semilla crezca, debe romper la cáscara; para crecer, debes romper el contrato de fidelidad al clan que te asfixia.",
+    "Kan": "La Trecena de Kan es la serpiente, la energía vital y la justicia interna. El síntoma físico es el grito de una energía estancada. Tu diseño tiene una instalación eléctrica de alta tensión; si no tienes una buena toma de tierra basada en la humildad, la potencia de tu nawal quemará tus circuitos internos. La serpiente cambia de piel para seguir creciendo; tú debes cambiar de programas para seguir viviendo.",
+    "Kame": "La Trecena de Kame gobierna los ciclos, los ancestros y la muerte simbólica. Morir simbólicamente es soltar el programa del pasado; el perdón libera tu carga biológica. Tu obra es una remodelación constante. No temas demoler muros viejos: en este terreno, la única forma de construir lo nuevo es aceptar que lo antiguo ya no sostiene el techo.",
+    "Kej": "La Trecena de Kej representa el pilar natural, la fuerza y el liderazgo. Tu necesidad de control es el disfraz de un miedo profundo a la vulnerabilidad. Eres el pilar central de tu sistema, pero cuidado: un pilar que no es flexible se quiebra ante el sismo. Aprende a distribuir la carga emocional o colapsarás por fatiga de materiales.",
+    "Q'anil": "La Trecena de Q'anil es la semilla, la realización y el ciclo de la cosecha. Toda semilla contiene el plano del fruto; si tu cosecha es amarga, audita la información del origen. Tu terreno está listo para el rascacielos, siempre y cuando el plano original sea tuyo y no una copia del plano frustrado de tus ancestros.",
+    "Toj": "La Trecena de Toj es el fuego purificador, la ofrenda y el pago de deudas. Lo que llamas mala suerte es a menudo el pago de deudas emocionales no resueltas. Estás compensando lo que otros no sanaron. Es momento de una auditoría de costos vital: nivela tus cuentas emocionales para que tu presupuesto de energía se invierta en tu propio edificio.",
+    "Tz'ikin": "La Trecena de Tz'ikin es la visión panorámica del águila, la prosperidad y la conexión con lo divino. Tu falta de abundancia no es escasez de recursos, sino miopía emocional. Estás mirando al suelo cuando debes elevar el vuelo para ver la solución. Tu diseño es una torre de control; si te pierdes en los detalles del ladrillo, perderás la perspectiva del edificio.",
+    "Ajmaq": "La Trecena de Ajmaq es el búho, la introspección y la limpieza de culpas. La culpa es un programa de castigo que paraliza tu biología. Perdonar a tus ancestros es dejar de pagar una hipoteca de una casa que no construiste. Es una auditoría de errores estructurales: nacer aquí es tener la oportunidad de corregir fallas del pasado sin ocultar las grietas del cimiento.",
+    "N'oj": "La Trecena de N'oj es el pensamiento estratégico, la inteligencia y la sincronía con la tierra. El exceso de análisis genera parálisis biológica. Tu mente debe ser un puente hacia la acción, no un laberinto donde esconder miedos a decidir. Eres el calculista de la obra: recuerda que un plano mental perfecto no es un edificio hasta que baja a la tierra.",
+    "Tijax": "La Trecena de Tijax es el cuchillo, el corte preciso y la cirugía emocional. La sanación a veces requiere un corte quirúrgico. Liberarse de un vínculo tóxico no es agresividad, es supervivencia biológica. Tu diseño permite separar lo útil de lo podrido; si no cortas lo infectado, el programa comprometerá toda la estructura.",
+    "Kawoq": "La Trecena de Kawoq es la tormenta, la comunidad y la crisis que limpia. La tormenta no viene a destruirte, viene a mostrar qué partes de tu casa no son sólidas. Tu terreno es un ecosistema complejo diseñado para sostener a muchos, pero asegúrate de que el peso de la comunidad no exceda la carga máxima de tus propias columnas.",
+    "Ajpu": "La Trecena de Ajpu es el cazador, el sol, la maestría y la luz. Llegar a la cima no es vencer a otros, es vencer tus propios programas de limitación. Eres el sol de tu propio sistema; si brillas, iluminas la sombra de tu árbol genealógico. Tu estructura está lista para ser el remate final de la obra: pura autoridad y materialización."
+};
+
+function renderizarTrecena(centro) {
+    let nawalTrecenaIndex = (centro.idx - (centro.tono - 1) + 20) % 20;
+    const nombreTrecena = nawalesConAp[nawalTrecenaIndex];
+    const contenedor = document.getElementById('trecenaContainer');
+    const textoElegante = trecenasElegantes[nombreTrecena] || `Clima de transformación profunda bajo la Trecena de ${nombreTrecena}.`;
+    contenedor.innerHTML = `<span class="trecena-title">CLIMA ENERGÉTICO: ${nombreTrecena.toUpperCase()}</span><p class="trecena-text">${textoElegante}</p><a href="shop.html" class="shop-link">EXPLORAR TIENDA &rarr;</a>`;
+}
+
+function dibujarCruz(cruz) {
+    const contenedor = document.getElementById('cruzGrid'); if (!contenedor) return; contenedor.innerHTML = '';
+    let grid = Array(5).fill().map(() => Array(5).fill(null));
+    for (let i = 0; i < cruz.length; i++) { const pos = coordenadas[i]; if (pos) grid[pos.row][pos.col] = cruz[i]; }
+    for (let r = 0; r < 5; r++) for (let c = 0; c < 5; c++) {
+        const item = grid[r][c];
+        if (!item) { const empty = document.createElement('div'); empty.style.visibility = 'hidden'; contenedor.appendChild(empty); continue; }
+        const card = document.createElement('div'); card.className = 'nawal-item'; if (item.posIndex === 6) card.classList.add('item-center');
+        const img = document.createElement('img'); img.className = 'nawal-img'; img.src = `nahuales/${item.nawal}.png`;
+        img.onerror = function() { this.style.display = 'none'; const fb = document.createElement('div'); fb.style.cssText = "width:40px;height:40px;border:1px solid #ccc;display:flex;align-items:center;justify-content:center;font-size:1.2rem;color:#666;"; fb.innerText = item.nawal.charAt(0); card.insertBefore(fb, this); };
+        const nameSpan = document.createElement('div'); nameSpan.className = 'nawal-label'; nameSpan.innerText = item.nawal;
+        const tonoSpan = document.createElement('div'); tonoSpan.className = 'nawal-num'; tonoSpan.innerText = item.tono;
+        card.appendChild(img); card.appendChild(nameSpan); card.appendChild(tonoSpan);
+        card.addEventListener('click', () => {
+            const panel = document.getElementById('textoLectura');
+            if (item.posIndex === 6) {
+                const texto = narrativas[item.nawal] ? narrativas[item.nawal][mapVisualToNarrativa[6]] : "Interpretación no disponible";
+                panel.innerHTML = `<strong>${item.nawal.toUpperCase()} — ${item.posNombre.toUpperCase()}</strong><br><br>${texto}`;
+            } else {
+                panel.innerHTML = `<strong>${item.nawal.toUpperCase()} — ${item.posNombre.toUpperCase()}</strong><br><br><em>Esta posición se decodifica en profundidad en el análisis completo.</em>`;
+            }
+        });
+        contenedor.appendChild(card);
+    }
+}
+
+let datosUsuario = {}; let centroGlobal = {}; let cruzGlobal = []; let narrativaGenerada = ""; let conocimientoBase = "";
+async function cargarConocimiento() { try { const r = await fetch('conocimiento.txt'); if (!r.ok) throw new Error(); conocimientoBase = await r.text(); } catch(e) { conocimientoBase = "ERROR: No se pudo cargar la base de conocimiento."; } }
+
+// ============================================================
+// PROMPT DINÁMICO POR TEMA
+// ============================================================
+function buildPromptIndividual(centro, cruz, nombre) {
+    const indices = posicionesCriticas[tipoCruz] || posicionesCriticas.esencia;
+    const posicionesAnalisis = indices.map(idx => ({ posNombre: nombresPos[idx], nawal: cruz[idx].nawal, tono: cruz[idx].tono }));
+    const resumen = posicionesAnalisis.map(p => `- ${p.posNombre}: Nahual ${p.nawal} (${p.tono})`).join('\n');
+    let nawalTrecenaIndex = (centro.idx - (centro.tono - 1) + 20) % 20;
+    const nombreTrecena = nawalesConAp[nawalTrecenaIndex];
+    const textoTrecena = trecenasElegantes[nombreTrecena] || "";
+    const titulos = { pareja: "PAREJA Y RELACIÓN ÍNTIMA", negocios: "NEGOCIOS Y PROYECTOS", familia: "FAMILIA Y LINAJE", esencia: "ESENCIA Y PROPÓSITO" };
+    const titulo = titulos[tipoCruz] || "ESENCIA";
+    const aviso = `AVISO LEGAL: Este reporte es una herramienta de autoconocimiento y no constituye un diagnóstico médico. Cualquier referencia a zonas corporales es metafórica.`;
+
+    let instruccionesTematicas = "";
+    if (tipoCruz === 'negocios') {
+        instruccionesTematicas = `ENFOQUE ESTRICTO PARA NEGOCIOS Y EJECUTIVOS:
+- PROHIBIDO usar términos místicos, esotéricos o espirituales (no uses "espacio sagrado", "alma", "vibración", "llamado ancestral"). 
+- Adapta el lenguaje a un tono ejecutivo, estratégico, comercial y directivo. Imagina que le hablas a un CEO o emprendedor.
+- Enfócate EXCLUSIVAMENTE en cómo estas energías impactan su: capacidad de liderazgo, gestión de equipos, toma de decisiones financieras, cierre de ventas, negociación, resolución de conflictos laborales y ejecución de proyectos.
+- Traduce las lealtades invisibles y programas inconscientes a "obstáculos operativos" o "techos de cristal" en su carrera o empresa (ej. "miedo a cobrar más", "dificultad para delegar", "auto-sabotaje en el momento de cerrar un contrato importante").
+- Usa los datos del conocimiento proporcionado para explicar por qué hay bloqueos de ingresos desde la Bioneuroemoción.`;
+    } else if (tipoCruz === 'familia') {
+        instruccionesTematicas = `ENFOQUE ESPECÍFICO PARA LINAJE Y SISTEMA FAMILIAR:
+- Enfócate en las dinámicas transgeneracionales, la relación con los padres (Proyecto Sentido), las lealtades familiares invisibles y los secretos de clan.
+- Explica cómo los conflictos actuales son ecos de dramas no resueltos de los abuelos o padres.
+- Usa un tono profundo, empático pero muy clínico en cuanto a repeticiones de patrones.`;
+    } else {
+        instruccionesTematicas = `ENFOQUE PARA ESENCIA:
+- Mantén un tono cálido, humano, revelador y enfocado en el autoconocimiento profundo y el propósito de vida.`;
+    }
+
+    return `Eres un Analista Senior en Calendario Sagrado Maya y Bioneuroemoción. Usa EXCLUSIVAMENTE este conocimiento:
+ ${conocimientoBase}
+
+Realiza un análisis para ${nombre}, cuyo Nahual de Esencia es ${centro.nawalConAp} (Tono ${centro.tono}) y su Trecena es ${nombreTrecena}.
+Contexto de Trecena: ${textoTrecena}
+Tema: ${titulo}.
+
+Posiciones clave de su Cruz (úsalas como guía interna, no las enumeres):
+ ${resumen}
+
+ ${instruccionesTematicas}
+
+INSTRUCCIONES GENERALES:
+- Escribe una narrativa continua, sin listas ni viñetas. 
+- Explica qué programas inconscientes operan en su vida y cómo se manifiestan en su conducta.
+- No te limites a describir cada nahual; cuéntale una historia directa y útil.
+- Menciona su nombre al menos dos veces de forma natural.
+- Incluye una analogía arquitectónica o estructural.
+- Título poético o impactante en **negrita** al inicio.
+- Extensión: alrededor de 800 palabras.
+ ${aviso}
+Escribe el informe:`;
+}
+
+// ============================================================
+// LLAMADA A GEMINI CON REINTENTOS AUTOMÁTICOS Y ROTACIÓN DE KEYS
+// ============================================================
+async function llamarGemini(prompt){
+    for(let i=0;i<5;i++){
+        try{
+            const r=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=${getKey()}`,{
+                method:'POST',headers:{'Content-Type':'application/json'},
+                body:JSON.stringify({contents:[{parts:[{text:prompt}]}],generationConfig:{temperature:0.85,maxOutputTokens:4000}})
+            });
+            if(r.status===429){const w=Math.pow(10,i+1)*1000;console.warn(`429 Rate limit. Reintento ${i+1}/5 en ${w/1000}s`);await new Promise(res=>setTimeout(res,w));continue;}
+            if(r.status===503){const w=Math.pow(8,i+1)*1000;console.warn(`503 Sobrecarga. Reintento ${i+1}/5 en ${w/1000}s`);await new Promise(res=>setTimeout(res,w));continue;}
+            if(!r.ok){const e=await r.json();console.error('GEMINI ERROR:',JSON.stringify(e,null,2));throw new Error(e.error?.message||'Error Gemini');}
+            const d=await r.json();return d.candidates?.[0]?.content?.parts?.[0]?.text||'';
+        }catch(err){if(i===4)throw err;console.warn(`Error red. Reintento ${i+1}/5 en 4s`);await new Promise(res=>setTimeout(res,4000));}
+    }
+    return '';
+}
+
+function textoAHtml(texto) { return texto.split('\n\n').filter(p => p.trim()).map(p => { p = p.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>'); return `<p>${p.trim()}</p>`; }).join(''); }
+
+async function iniciarDesdeURL() {
+    await cargarConocimiento();
+    const params = new URLSearchParams(window.location.search);
+    const dia = parseInt(params.get('dia')); const mes = parseInt(params.get('mes')); const anio = parseInt(params.get('anio'));
+    const nombre = params.get('nombre') || "Consultante"; const email = params.get('email') || "";
+    if (isNaN(dia)) return;
+    datosUsuario = { dia, mes, anio, nombre, email };
+    centroGlobal = calcularCentro(dia, mes, anio);
+    cruzGlobal = generarCruz(centroGlobal);
+    
+    const estadoDiv = document.getElementById('estado-generacion');
+    const errorDiv = document.getElementById('error-container');
+    const contenidoDiv = document.getElementById('contenido-principal');
+    
+    if (modoIA === 'gratis') {
+        document.getElementById('titulo-resultado').innerHTML = `Matriz de <i>${nombre}</i>`;
+        dibujarCruz(cruzGlobal); renderizarTrecena(centroGlobal);
+        const textoCentro = narrativas[centroGlobal.nawalSinAp] ? narrativas[centroGlobal.nawalSinAp][mapVisualToNarrativa[6]] : "Interpretación no disponible";
+        document.getElementById('textoLectura').innerHTML = `<strong>${centroGlobal.nawalSinAp.toUpperCase()} — ESENCIA (${centroGlobal.tono})</strong><br><br>${textoCentro}`;
+        contenidoDiv.style.display = 'block'; estadoDiv.style.display = 'none';
+        document.getElementById('btn-descargar').disabled = false; document.getElementById('btn-descargar').textContent = 'DESCARGAR REPORTE GRATIS';
+    } else if (modoIA === 'pago') {
+        contenidoDiv.style.display = 'none'; errorDiv.style.display = 'none';
+        estadoDiv.style.display = 'block'; estadoDiv.innerHTML = '<span class="spinner"></span> GENERANDO ANÁLISIS PROFUNDO...';
+        try {
+            const prompt = buildPromptIndividual(centroGlobal, cruzGlobal, nombre);
+            narrativaGenerada = await llamarGemini(prompt);
+            if(!narrativaGenerada || narrativaGenerada.length < 100) throw new Error("Respuesta vacía o demasiado corta");
+            document.getElementById('titulo-resultado').innerHTML = `Matriz de <i>${nombre}</i>`;
+            dibujarCruz(cruzGlobal); renderizarTrecena(centroGlobal);
+            const textoCentro = narrativas[centroGlobal.nawalSinAp] ? narrativas[centroGlobal.nawalSinAp][mapVisualToNarrativa[6]] : "Interpretación no disponible";
+            document.getElementById('textoLectura').innerHTML = `<strong>${centroGlobal.nawalSinAp.toUpperCase()} — ESENCIA (${centroGlobal.tono})</strong><br><br>${textoCentro}`;
+            document.getElementById('texto-narrativa-ia').innerHTML = textoAHtml(narrativaGenerada);
+            document.getElementById('seccion-narrativa').style.display = 'block';
+            contenidoDiv.style.display = 'block'; estadoDiv.style.display = 'none';
+            document.getElementById('btn-descargar').disabled = false; document.getElementById('btn-descargar').textContent = 'DESCARGAR REPORTE COMPLETO';
+        } catch (err) {
+            console.error(err); estadoDiv.style.display = 'none'; errorDiv.style.display = 'block';
+            errorDiv.innerHTML = `Error al generar: ${err.message}`; contenidoDiv.style.display = 'none';
+            document.getElementById('btn-descargar').disabled = true; document.getElementById('btn-descargar').textContent = 'ERROR';
+        }
+    }
+}
+
+// ============================================================
+// CONCLUSIONES DINÁMICAS
+// ============================================================
+const datosConclusion = {
+    "Imox": { elem: "agua primordial", don: "acceder a memorias que otros no pueden ver", sombra: "la dispersión y el caos mental como mecanismo de evasión" },
+    "IQ": { elem: "viento sagrado", don: "transformar realidades a través de la palabra", sombra: "la inconstancia como forma de huir del compromiso profundo" },
+    "AKBAL": { elem: "umbral entre luces y sombras", don: "ver lo que otros ocultan", sombra: "la melancolía como lealtad al dolor de los ancestros" },
+    "KAT": { elem: "red invisible", don: "tejer alianzas y encontrar oportunidades", sombra: "el enredo como forma de no superar a la familia" },
+    "kan": { elem: "fuerza vital", don: "la capacidad de reinventarte y sanar desde el fuego interno", sombra: "la inflamación física y emocional por justicia no expresada" },
+    "Kame": { elem: "ciclo de muerte y renacimiento", don: "soltar lo que otros no pueden soltar", sombra: "la culpa transgeneracional como ancla que te impide nacer de nuevo" },
+    "Kej": { elem: "pilar natural", don: "cargar con la estructura de muchos sin colapsar", sombra: "el control como disfraz del terror a la vulnerabilidad" },
+    "Qanil": { elem: "semilla realizada", don: "la paciencia para materializar ciclos completos de éxito", sombra: "crecer en un terreno que no es tuyo" },
+    "Toj": { elem: "fuego purificador", don: "restaurar el orden donde hubo injusticia", sombra: "pagar facturas emocionales de una obra que no construiste tú" },
+    "Tzi": { elem: "lealtad instintiva", don: "la fidelidad que cohesiona grupos y protege lo sagrado", sombra: "la desconfianza sistémica que aleja las alianzas que necesitas" },
+    "Batz": { elem: "hilo del tiempo", don: "tejer realidad a partir de la imaginación con precisión artesanal", sombra: "el perfeccionismo paralizante heredado del miedo al juicio" },
+    "E": { elem: "camino y la travesía", don: "abrir rutas donde no las hay", sombra: "la incapacidad de echar raíces por miedo a la exclusión" },
+    "Aj": { elem: "cogollo del maíz", don: "liderar desde el servicio, no desde el ego", sombra: "el sacrificio perpetuo como contrato invisible de fidelidad al sufrimiento" },
+    "Ix": { elem: "fuerza de la tierra", don: "la intuición como radar de peligros invisibles", sombra: "la sobreprotección como respuesta a una infancia sin contención" },
+    "Tzikin": { elem: "visión panorámica", don: "ver el plano completo antes que nadie", sombra: "la miopía emocional que te hace mirar al suelo" },
+    "Ajmaq": { elem: "sabiduría del error", don: "transformar culpas en comprensión, errores en maestría", sombra: "la autocrítica severa que paraliza tu capacidad de ejecución" },
+    "Noj": { elem: "pensamiento estratégico", don: "generar planos mentales perfectos que otros pueden materializar", sombra: "el exceso de análisis que paraliza la biología" },
+    "Tijax": { elem: "corte preciso", don: "separar lo útil de lo podrido con exactitud quirúrgica", sombra: "la agresividad como programa heredado de ancestros" },
+    "Kawoq": { elem: "tormenta que limpia", don: "sostener ecosistemas complejos y estructuras humanas", sombra: "absorber el peso de los demás hasta agotar tus cimientos" },
+    "Ajpu": { elem: "luz del cazador", don: "alcanzar la cima y convertirla en referencia", sombra: "el techo de cristal del clan que te impide brillar" }
+};
+function generarConclusion(nawal, tipo, nombre) {
+    const d = datosConclusion[nawal]; if (!d) return `${nombre}, tu estructura energética es única.`;
+    const cierres = {
+        esencia: `${nombre}, tu fecha de nacimiento no es una condena, es el código de acceso a tu libertad biológica. Tu ${d.elem} ya está trabajando a tu favor; solo necesitas dejar de resistirte a ella.`,
+        negocios: `${nombre}, en la arquitectura de tus proyectos, no se trata de trabajar más, sino de alinear tu conducta con tu diseño original. Tu don de ${d.don} es tu ventaja competitiva real, no una metáfora.`,
+        familia: `${nombre}, sanar el vínculo con tu linaje no es un acto de traición, es el mayor acto de lealtad hacia ti mismo. Al soltar la sombra de ${d.sombra}, te conviertes en el primer miembro libre del clan.`
+    };
+    return `${nombre}, tu estructura está atravesada por el elemento ${d.elem}. Tu don más profundo —${d.don}— es también el área donde tu árbol genealógico dejó heridas sin resolver. La sombra de ${d.sombra} no es un defecto tuyo: es un programa de supervivencia que ya cumplió su función. ${cierres[tipo] || cierres.esencia}`;
+}
+
+// ============================================================
+// GENERACIÓN PDF
+// ============================================================
+async function generarPDF() {
+    try {
+    const btn = document.getElementById('btn-descargar');
+    if (document.getElementById('contenido-principal').style.display !== 'block') { alert("Análisis no disponible."); return; }
+    btn.disabled = true; btn.textContent = 'GENERANDO...';
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF('p', 'mm', 'a4');
+    const pW = doc.internal.pageSize.getWidth(), pH = doc.internal.pageSize.getHeight();
+    const mI = 22, mD = 22, aU = pW - mI - mD, fH = 16, seg = pH - fH - 12;
+    let y = 30;
+    const esPago = modoIA === 'pago';
+    const nombreTema = { esencia: 'Esencia', negocios: 'Negocios', familia: 'Linaje Ancestral' }[tipoCruz] || 'Esencia';
+    const logo = await new Promise(res => { const img = new Image(); img.onload = () => { const c = document.createElement('canvas'); c.width = img.width; c.height = img.height; c.getContext('2d').drawImage(img, 0, 0); res({ d: c.toDataURL('image/png'), w: img.width, h: img.height }); }; img.onerror = () => res(null); img.src = 'img/logo.png'; });
+    const firmaImg = await new Promise(res => { const img = new Image(); img.onload = () => { const c = document.createElement('canvas'); c.width = img.width; c.height = img.height; c.getContext('2d').drawImage(img, 0, 0); res({ d: c.toDataURL('image/png'), w: img.width, h: img.height }); }; img.onerror = () => res(null); img.src = 'img/firma.png'; });
+    let nawalTrecenaIndex = (centroGlobal.idx - (centroGlobal.tono - 1) + 20) % 20;
+    const nombreTrecena = nawalesConAp[nawalTrecenaIndex];
+    const textoTrecenaPDF = trecenasElegantes[nombreTrecena] || "";
+
+    const pie = () => { const fy = pH - fH + 3; doc.setDrawColor(210,210,210); doc.setLineWidth(0.2); doc.line(mI,fy-3,pW-mD,fy-3); doc.setFontSize(7.5); doc.setFont('helvetica','normal'); doc.setTextColor(46,139,87); doc.text('protocolo.cruzmaya@gmail.com',mI,fy); doc.setTextColor(160,160,160); doc.text(`Pagina ${doc.internal.getNumberOfPages()}`,pW-mD,fy,{align:'right'}); };
+    const lmp = t => t ? t.replace(/<[^>]*>/g,'').replace(/[\u2018\u2019\u201C\u201D]/g,"'").replace(/[^\x20-\x7E\u00A0-\u00FF]/g,'').trim() : '';
+    const salt = (minRest) => { if (y + (minRest || 20) > seg) { doc.addPage(); pie(); y = 38; } };
+    const par = (txt, fs, ff, fst, col, x = mI) => {
+        const t = lmp(txt); if (!t) return;
+        doc.setFontSize(fs); doc.setFont(ff, fst); doc.setTextColor(col[0], col[1], col[2]);
+        const aL = fs * 0.3527 * 1.55; const palabras = t.split(/\s+/); if (!palabras.length) return;
+        const lineas = []; let linea = [];
+        for (const p of palabras) { const test = [...linea, p].join(' '); if (doc.getTextWidth(test) > aU && linea.length > 0) { lineas.push([...linea]); linea = [p]; } else { linea.push(p); } }
+        if (linea.length) lineas.push(linea);
+        const maxEsp = doc.getTextWidth(' ') * 2.2;
+        for (let i = 0; i < lineas.length; i++) {
+            const esUlt = (i === lineas.length - 1); const pals = lineas[i];
+            if (y + aL > seg) { doc.addPage(); pie(); y = 38; doc.setFontSize(fs); doc.setFont(ff, fst); doc.setTextColor(col[0], col[1], col[2]); }
+            if (esUlt || pals.length === 1) { doc.text(pals.join(' '), x, y); }
+            else { let anchoP = 0; const anchos = pals.map(p => { const w = doc.getTextWidth(p); anchoP += w; return w; }); const espExtra = (aU - anchoP) / (pals.length - 1); if (espExtra > maxEsp) { doc.text(pals.join(' '), x, y); } else { let xp = x; for (let j = 0; j < pals.length; j++) { doc.text(pals[j], xp, y); xp += anchos[j] + espExtra; } } }
+            y += aL;
+        }
+        y += 3;
+    };
+    const titulo = (txt, fs, ff, fst, col, align = 'center') => {
+        const t = lmp(txt); if (!t) return; const ls = doc.splitTextToSize(t, aU);
+        doc.setFontSize(fs); doc.setFont(ff, fst); doc.setTextColor(col[0], col[1], col[2]); const xPos = align === 'center' ? pW / 2 : mI;
+        for (const l of ls) { salt(12); doc.text(l, xPos, y, { align }); y += fs * 0.45; } y += 4;
+    };
+
+    // PÁGINA 1
+    pie();
+    if (logo) { const lw = 65, lh = lw * (logo.h / logo.w); doc.addImage(logo.d, 'PNG', (pW - lw) / 2, y, lw, lh); y += lh + 14; }
+    y += 4;
+    doc.setFontSize(10.5); doc.setFont('times', 'italic'); doc.setTextColor(80, 80, 80);
+    const fls = doc.splitTextToSize('"Comprender tu diseño estructural es liberar las tensiones que dictan tu realidad física, emocional y financiera."', aU - 10);
+    for (const l of fls) { doc.text(l, pW / 2, y, { align: 'center', maxWidth: aU - 10 }); y += 6.5; }
+    y += 10; doc.setDrawColor(46, 139, 87); doc.setLineWidth(0.3); doc.line(mI + 20, y, pW - mD - 20, y); y += 14;
+    titulo(`Análisis de ${nombreTema}`, 22, 'times', 'italic', [46, 139, 87]);
+    titulo(`Reporte ${esPago ? 'Completo' : 'Gratuito'} · Protocolo Cruz Maya`, 8.5, 'helvetica', 'normal', [180, 180, 180]);
+    doc.setDrawColor(46, 139, 87); doc.setLineWidth(0.3); doc.line(mI + 20, y, pW - mD - 20, y);
+
+    // PÁGINA 2
+    doc.addPage(); pie(); y = 38;
+    titulo('Lectura Personalizada', 18, 'times', 'italic', [46, 139, 87]); y += 2;
+    doc.setFillColor(245, 245, 245); doc.rect(mI, y - 4, aU, 28, 'F');
+    doc.setFontSize(15); doc.setFont('times', 'bold'); doc.setTextColor(10, 10, 10); doc.text(datosUsuario.nombre, pW / 2, y + 6, { align: 'center' });
+    doc.setFontSize(11); doc.setFont('helvetica', 'normal'); doc.setTextColor(100, 100, 100); doc.text(`${datosUsuario.dia}/${datosUsuario.mes}/${datosUsuario.anio}`, pW / 2, y + 14, { align: 'center' });
+    if (datosUsuario.email) doc.text(datosUsuario.email, pW / 2, y + 21, { align: 'center' });
+    y += 32;
+    try {
+        const el = document.getElementById('area-pdf'); const cv = await html2canvas(el, { scale: 3, backgroundColor: '#FFFFFF', width: el.scrollWidth, height: el.scrollHeight });
+        let iw = Math.min(105, aU); let ih = iw * (cv.height / cv.width);
+        if (y + ih + 20 > seg) { doc.addPage(); pie(); y = 38; }
+        doc.addImage(cv.toDataURL('image/png'), 'PNG', (pW - iw) / 2, y, iw, ih); y += ih + 8;
+    } catch (e) { y += 4; }
+    if (textoTrecenaPDF) {
+        salt(25); doc.setFontSize(8); doc.setFont('helvetica', 'bold'); doc.setTextColor(46, 139, 87);
+        doc.text(`TRECENA DE ${nombreTrecena.toUpperCase()}`, mI, y); y += 2;
+        doc.setDrawColor(230, 230, 230); doc.setLineWidth(0.18); doc.line(mI, y, pW - mD, y); y += 6;
+        par(textoTrecenaPDF, 9.5, 'times', 'italic', [60, 60, 60]);
+    }
+
+    // PÁGINA 3
+    doc.addPage(); pie(); y = 38;
+    titulo(`${centroGlobal.nawalSinAp.toUpperCase()} · Tono ${centroGlobal.tono}`, 20, 'times', 'italic', [46, 139, 87]);
+    titulo(`Trecena de ${nombreTrecena}`, 10, 'helvetica', 'normal', [160, 160, 160]); y += 2;
+    doc.setDrawColor(46, 139, 87); doc.setLineWidth(0.2); doc.line(mI, y, pW - mD, y); y += 8;
+    par(lmp(narrativas[centroGlobal.nawalSinAp]?.[mapVisualToNarrativa[6]] || 'No disponible'), 11, 'times', 'normal', [30, 30, 30]);
+
+    // NARRATIVA IA
+    if (esPago && narrativaGenerada) {
+        doc.addPage(); pie(); y = 38;
+        titulo('Tu Estructura de Conciencia', 18, 'times', 'bold', [10, 10, 10]);
+        titulo(`ANÁLISIS PROFUNDO · ${nombreTema.toUpperCase()} · PROTOCOLO CRUZ MAYA`, 7.5, 'helvetica', 'normal', [46, 139, 87]); y += 2;
+        doc.setDrawColor(230, 230, 230); doc.setLineWidth(0.18); doc.line(mI, y, pW - mD, y); y += 7;
+        const bloques = narrativaGenerada.split('\n\n').filter(p => p.trim());
+        for (const bloque of bloques) {
+            const tl = lmp(bloque.replace(/\*\*(.*?)\*\*/g, '$1').trim()); if (!tl) continue;
+            if (bloque.startsWith('**') && bloque.endsWith('**')) {
+                salt(16); doc.setFontSize(13); doc.setFont('times', 'bolditalic'); doc.setTextColor(46, 139, 87);
+                const ls2 = doc.splitTextToSize(tl, aU); for (const l of ls2) { salt(8); doc.text(l, pW / 2, y, { align: 'center' }); y += 8; } y += 3;
+            } else { par(tl, 11, 'times', 'normal', [30, 30, 30]); }
+        }
+        salt(18); doc.setDrawColor(220, 220, 220); doc.setLineWidth(0.15); doc.line(mI, y, pW - mD, y); y += 5;
+        par('AVISO LEGAL: Este informe es una herramienta de autoconocimiento basada en la cosmovisión maya y principios de bioneuroemoción. No constituye un diagnóstico médico, psicológico ni financiero. Las posibles correlaciones biológicas mencionadas son interpretaciones metafóricas y no deben sustituir el consejo de un profesional cualificado.', 7, 'helvetica', 'italic', [170, 170, 170]);
+    }
+
+    // CONCLUSIÓN INTELIGENTE
+    salt(65); y += 5;
+    doc.setDrawColor(46, 139, 87); doc.setLineWidth(0.35); doc.line(mI + 10, y, pW - mD - 10, y); y += 14;
+    titulo('Conclusión del Arquitecto', 18, 'times', 'italic', [46, 139, 87]);
+    doc.setDrawColor(220, 220, 220); doc.setLineWidth(0.2); doc.line(mI + 30, y, pW - mD - 30, y); y += 10;
+    const textoConclusion = esPago ? generarConclusion(centroGlobal.nawalSinAp, tipoCruz, datosUsuario.nombre) : 'Has descubierto la semilla de tu existencia, y eso es un logro enorme. Sin embargo, en la cosmovisión maya, la semilla no crece aislada. Conocer únicamente tu Esencia es como tener el mapa de una casa, pero ignorar los planos de ingeniería. ¿Qué programas inconscientes heredaste de tu linaje que aún hoy condicionan tu éxito? Las respuestas están en las 13 posiciones de tu Cruz Maya Individual.';
+    par(textoConclusion, 11, 'times', 'normal', [30, 30, 30]);
+
+    salt(35); y += 10;
+    doc.setDrawColor(200, 200, 200); doc.setLineWidth(0.5); doc.line(mI, y, pW - mD, y); y += 12;
+    const hoy = new Date(); const meses = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+    doc.setFontSize(9.5); doc.setFont('helvetica', 'normal'); doc.setTextColor(100, 100, 100); doc.text(`${hoy.getDate()} de ${meses[hoy.getMonth()]} de ${hoy.getFullYear()}`, mI, y);
+    if (firmaImg) { const fw = 80, fh = fw * (firmaImg.h / firmaImg.w); doc.addImage(firmaImg.d, 'PNG', pW - mD - fw, y - 8, fw, fh); }
+    else { doc.setFontSize(11); doc.setFont('times', 'italic'); doc.setTextColor(46, 139, 87); doc.text('Protocolo Cruz Maya', pW - mD, y, { align: 'right' }); }
+
+    doc.save(`Cruz_Maya_${nombreTema}_${datosUsuario.nombre.replace(/\s/g, '_')}.pdf`);
+    btn.disabled = false; btn.textContent = esPago ? 'DESCARGAR REPORTE COMPLETO' : 'DESCARGAR REPORTE GRATIS';
+
+    } catch(err) {
+        alert('Error al generar PDF: ' + err.message);
+        console.error(err);
+        const btn = document.getElementById('btn-descargar');
+        if(btn){ btn.disabled = false; btn.textContent = 'DESCARGAR REPORTE'; }
+    }
+}
+window.addEventListener('DOMContentLoaded', iniciarDesdeURL);
+</script>
+</body>
+</html>

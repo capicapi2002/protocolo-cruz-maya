@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Metodología — Protocolo Cruz Maya</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@100;300;400&family=Space+Mono&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --black: #0A0A0A;
+            --white: #FFFFFF;
+            --grey-base: 232, 232, 232;
+            --accent: #2E8B57;
+            --font-serif: 'Playfair Display', serif;
+            --font-mono: 'Space Mono', monospace;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background-color: var(--white); color: var(--black); font-family: 'Inter', sans-serif; overflow-x: hidden; }
+
+        /* --- FONDO DINÁMICO --- */
+        #bg-canvas {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -2;
+            background: radial-gradient(circle at center, #ffffff 0%, #e0e0e0 100%);
+        }
+
+        /* --- NAVEGACIÓN --- */
+        nav.main-nav {
+            position: absolute;
+            top: 40px; right: 50px;
+            display: flex; gap: 35px;
+            z-index: 100;
+        }
+        nav.main-nav a {
+            text-decoration: none;
+            color: var(--black);
+            font-family: var(--font-mono);
+            font-size: 0.65rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            opacity: 0.6;
+        }
+
+        /* --- CABECERA --- */
+        header {
+            height: 25vh; 
+            display: flex;
+            justify-content: center;
+            align-items: center; 
+            position: relative;
+            padding-top: 20px; 
+        }
+        .logo-nav { width: 160px; height: auto; cursor: pointer; }
+
+        /* --- CONTENEDOR PRINCIPAL --- */
+        .content-wrapper { max-width: 1000px; margin: 0 auto; padding: 0 20px 80px 20px; }
+
+        .intro-section { text-align: center; margin-bottom: 80px; }
+        .intro-section h1 { font-family: var(--font-serif); font-size: 3.2rem; font-weight: 400; margin-bottom: 20px; }
+        .intro-section p { max-width: 700px; margin: 0 auto; font-size: 1.1rem; line-height: 1.8; opacity: 0.8; }
+
+        /* --- ZONAS GRISES DE ANÁLISIS --- */
+        .tech-section {
+            position: relative;
+            padding: 70px 60px;
+            margin-bottom: 50px;
+            background: transparent;
+        }
+        .tech-section::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(var(--grey-base), 0.7);
+            backdrop-filter: blur(10px);
+            z-index: -1;
+            border-radius: 4px;
+        }
+
+        .grid-tech { display: grid; grid-template-columns: 1fr 1fr; gap: 50px; align-items: center; }
+        .tech-img { width: 100%; mix-blend-mode: multiply; border-radius: 2px; }
+        
+        .tech-text h2 { font-family: var(--font-serif); font-size: 2.2rem; margin-bottom: 20px; font-weight: 400; }
+        .tech-text h2 span { color: var(--accent); font-style: italic; }
+        .tech-text p { font-size: 1rem; line-height: 1.7; margin-bottom: 20px; text-align: justify; }
+        
+        /* Lista técnica elegante */
+        .tech-list {
+            list-style: none; border-left: 2px solid var(--accent); padding-left: 20px; margin-top: 20px;
+        }
+        .tech-list li {
+            font-size: 0.9rem; margin-bottom: 12px; color: #444; font-family: var(--font-sans);
+        }
+        .tech-list li strong { font-family: var(--font-mono); font-size: 0.75rem; text-transform: uppercase; color: var(--black); display: block; margin-bottom: 4px; }
+
+        /* --- BOTONES DE ACCIÓN DOBLE --- */
+        .card-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .btn-ver-coleccion {
+            display: block; text-align: center; padding: 15px 0; width: 100%;
+            border-top: 1px solid #eee; color: var(--accent);
+            font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 2px;
+            transition: background 0.3s, color 0.3s; text-decoration: none; margin-top: 20px;
+        }
+        .btn-ver-coleccion:hover { background: var(--accent); color: white; border-color: var(--accent); }
+
+        /* --- ESTILOS BOTÓN GENERADOR CÓDIGO --- */
+        .tooltip-container {
+            position: relative;
+            display: inline-block;
+        }
+        .btn-get-code {
+            background: transparent;
+            color: var(--black);
+            border: 1px solid rgba(0,0,0,0.2);
+            display: block;
+            text-align: center;
+            padding: 15px 0;
+            width: 100%;
+            font-family: var(--font-mono);
+            font-size: 0.65rem;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+        }
+        .btn-get-code:hover {
+            background: rgba(0,0,0,0.05);
+            border-color: var(--black);
+        }
+        /* Tooltip */
+        .tooltip-container .tooltiptext {
+            visibility: hidden;
+            width: 220px;
+            background-color: var(--black);
+            color: #fff;
+            text-align: center;
+            border-radius: 4px;
+            padding: 12px;
+            position: absolute;
+            z-index: 100;
+            bottom: 115%; 
+            left: 50%;
+            margin-left: -110px; 
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-family: var(--font-sans);
+            font-size: 0.75rem;
+            line-height: 1.4;
+            pointer-events: none;
+        }
+        .tooltip-container:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+        .tooltip-container .tooltiptext::after {
+            content: "";
+            position: absolute;
+            top: 100%; 
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: var(--black) transparent transparent transparent;
+        }
+
+        /* --- FRANJA NEGRA --- */
+        .philosophy-strip {
+            background-color: var(--black); color: var(--white); padding: 50px 0; 
+            margin: 50px 0; position: relative; width: 100vw; left: 50%; right: 50%; margin-left: -50vw; margin-right: -50vw; z-index: 1;
+        }
+        .phi-container { max-width: 800px; margin: 0 auto; text-align: center; padding: 0 20px; }
+        .phi-container h3 { font-family: var(--font-serif); font-size: 1.9rem; margin-bottom: 20px; font-weight: 400; }
+        .phi-container p { font-family: var(--font-mono); font-size: 0.8rem; letter-spacing: 1px; line-height: 1.8; opacity: 0.7; }
+
+        /* --- FOOTER --- */
+        footer {
+            background-color: var(--black); color: var(--white); padding: 60px 80px;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .footer-brand { display: flex; flex-direction: column; align-items: center; }
+        .protocolo-f { font-family: var(--font-mono); font-size: 0.6rem; letter-spacing: 10px; text-transform: uppercase; opacity: 0.5; }
+        .cruzmaya-f { font-family: var(--font-serif); font-size: 2rem; font-weight: 400; }
+
+        @media (max-width: 850px) {
+            .grid-tech { grid-template-columns: 1fr; }
+            .tech-section { padding: 40px 25px; }
+            .philosophy-strip h3 { font-size: 1.5rem; }
+            footer { flex-direction: column; gap: 20px; padding: 30px; }
+            .intro-section h1 { font-size: 2.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="bg-canvas"></canvas>
+
+    <nav class="main-nav">
+        <a href="index.html">Inicio</a>
+        <a href="shop.html">Shop</a>
+        <a href="contacto.html">Contacto</a>
+    </nav>
+
+    <header>
+        <img src="img/logo.png" alt="Logo" class="logo-nav" onclick="window.location.href='index.html'">
+    </header>
+
+    <main class="content-wrapper">
+        
+        <section class="intro-section">
+            <h1>Ingeniería de la <i>Precisión</i></h1>
+            <p>La interpretación humana no debe ser una adivinanza, sino una ecuación. Dividimos nuestro diagnóstico en niveles de resolución técnica para que la información no sea solo reveladora, sino <b>quirúrgicamente útil</b> para tu vida cotidiana.</p>
+        </section>
+
+        <section class="tech-section">
+            <div class="grid-tech">
+                <div class="tech-text">
+                    <h2>01. Matriz <span>Esencial</span></h2>
+                    <p>Es el punto cero termodinámico. Aquí calculamos tu <b>Nahual Central</b>, la frecuencia base que define tu arquitectura psicológica.</p>
+                    <p>Este nivel es gratuito porque creemos que nadie debería navegar sin saber qué motor impulsa su existencia. Es la brújula de tu temperamento.</p>
+                    
+                    <!-- CONTENEDOR DE BOTONES DOBLE -->
+                    <div class="card-actions">
+                        <a href="analisis-gratuito.html" class="btn-ver-coleccion">CONFIGURAR MATRIZ GRATIS</a>
+                        
+                        <!-- NUEVO BOTÓN GENERADOR CÓDIGO -->
+                        <div class="tooltip-container">
+                            <button class="btn-get-code" onclick="window.open('https://www.instagram.com/tu_cuenta_aqui', '_blank')">
+                                GENERAR CÓDIGO DE ACCESO
+                            </button>
+                            <span class="tooltiptext">1. Síguenos en Instagram<br>2. Comenta "CRUZ"<br>3. Recibirás tu código único</span>
+                        </div>
+                    </div>
+                </div>
+                <img src="img/basica.jpg" alt="Esencial" class="tech-img">
+            </div>
+        </section>
+
+        <div class="philosophy-strip">
+            <div class="phi-container">
+                <h3>La Ley de la Especificidad</h3>
+                <p>UN DIAGNÓSTICO DE SALUD NO PUEDE LEERSE CON LAS MISMAS VARIABLES QUE UN DIAGNÓSTICO FINANCIERO. EL SISTEMA NERVIOSO REQUIERE NARRATIVAS DIFERENCIADAS PARA ACTIVAR LA SANACIÓN DE CADA ÁREA DE TU VIDA.</p>
+            </div>
+        </div>
+
+        <section class="tech-section">
+            <div class="grid-tech">
+                <img src="img/individual.jpg" alt="Individual" class="tech-img">
+                <div class="tech-text">
+                    <h2>02. Auditoría <span>Individual</span></h2>
+                    <p>Una matriz humana tiene múltiples dimensiones operativas. Para ofrecer una respuesta útil, segmentamos el análisis en tres especializaciones independientes:</p>
+                    
+                    <ul class="tech-list">
+                        <li>
+                            <strong>Cruz de Prosperidad (Negocios)</strong>
+                            Analizamos la tensión entre tu Nahual de Conocimiento (Ideas) y tu Nahual de Acción (Cierre). Detectamos fugas de capital energético y bloqueos para manifestar riqueza.
+                        </li>
+                        <li>
+                            <strong>Cruz de Vitalidad (Bioneuroemoción)</strong>
+                            Mapeamos los brazos laterales de tu cruz para detectar dónde tu biología está repitiendo traumas. La enfermedad no es mala suerte, es la biología gritando un mensaje estructural.
+                        </li>
+                        <li>
+                            <strong>Cruz de Linaje (Ancestral)</strong>
+                            Decodificamos las cuatro diagonales para identificar qué deudas kármicas o mandatos invisibles heredaste de tu árbol genealógico y están frenando tu presente.
+                        </li>
+                    </ul>
+                    <a href="analisis-individual.html" class="btn-ver-coleccion" style="display:block; text-align:center; padding:12px 0; width:100%; border-top:1px solid #eee; color:var(--accent); font-family:var(--font-mono); font-size:0.7rem; letter-spacing:2px; text-decoration:none; margin-top:20px;">GENERAR AUDITORÍA INDIVIDUAL</a>
+                </div>
+            </div>
+        </section>
+
+        <section class="tech-section">
+            <div class="grid-tech">
+                <div class="tech-text">
+                    <h2>03. Sincronía de <span>Vínculos</span></h2>
+                    <p>El ser humano no es un monolito; somos nodos en una red. La comparativa no busca "compatibilidad romántica", sino <b>eficiencia estructural</b>. Analizamos cómo dos matrices energéticas interactúan en el espacio tiempo:</p>
+
+                    <ul class="tech-list">
+                        <li>
+                            <strong>Alianzas de Vida (Pareja)</strong>
+                            Identificamos si el vínculo actúa como un catalizador de crecimiento mutuo o si existe una fricción estructural que desgasta el sistema nervioso de ambos.
+                        </li>
+                        <li>
+                            <strong>Alianzas Comerciales (Socios)</strong>
+                            Medimos la "resistencia al impacto" de la unión. ¿Suman sus energías para crear un tercero más fuerte (el proyecto), o se diluyen en el proceso?
+                        </li>
+                        <li>
+                            <strong>Red de Entorno (Amigos/Familia)</strong>
+                            Detectamos el "Enemigo Inconsciente". Aquellos cercanos a ti que, por configuración de Nahual, están drenando tu energía de éxito o bloqueando tu flujo natural sin intención maliciosa.
+                        </li>
+                    </ul>
+                    <a href="analisis-comparativo.html" class="btn-ver-coleccion" style="display:block; text-align:center; padding:12px 0; width:100%; border-top:1px solid #eee; color:var(--accent); font-family:var(--font-mono); font-size:0.7rem; letter-spacing:2px; text-decoration:none; margin-top:20px;">GENERAR SINCRONÍA DE VÍNCULOS</a>
+                </div>
+                <img src="img/comparativa.jpg" alt="Comparativa" class="tech-img">
+            </div>
+        </section>
+
+    </main>
+
+    <footer>
+        <div class="footer-brand">
+            <span class="protocolo-f">PROTOCOLO</span>
+            <span class="cruzmaya-f">Cruz Maya</span>
+        </div>
+        <div style="display: flex; gap: 30px;">
+            <a href="index.html" style="color:white; opacity:0.3; text-decoration:none; font-family:var(--font-mono); font-size:0.65rem;">INICIO</a>
+            <a href="mailto:protocolo.cruzmaya@gmail.com" style="color:white; opacity:0.3; text-decoration:none; font-family:var(--font-mono); font-size:0.65rem;">CONTACTO</a>
+        </div>
+    </footer>
+
+    <script>
+        const canvas = document.getElementById('bg-canvas');
+        const ctx = canvas.getContext('2d');
+        let points = [];
+        let mouse = { x: 0, y: 0 };
+        function init() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            points = [];
+            for(let i=0; i<65; i++) {
+                points.push({
+                    x: Math.random()*canvas.width,
+                    y: Math.random()*canvas.height,
+                    vx: (Math.random()-0.5)*0.5, vy: (Math.random()-0.5)*0.5
+                });
+            }
+        }
+        window.addEventListener('mousemove', (e) => {
+            mouse.x = (e.clientX - canvas.width/2) * 0.05;
+            mouse.y = (e.clientY - canvas.height/2) * 0.05;
+        });
+        function animate() {
+            ctx.clearRect(0,0,canvas.width, canvas.height);
+            ctx.strokeStyle = "rgba(46, 139, 87, 0.3)"; 
+            ctx.fillStyle = "rgba(0,0,0,0.12)";
+            points.forEach((p, i) => {
+                p.x += p.vx; p.y += p.vy;
+                if(p.x<0 || p.x>canvas.width) p.vx*=-1;
+                if(p.y<0 || p.y>canvas.height) p.vy*=-1;
+                let tx = p.x + mouse.x; let ty = p.y + mouse.y;
+                ctx.beginPath(); ctx.arc(tx, ty, 1.8, 0, Math.PI*2); ctx.fill();
+                for(let j=i+1; j<points.length; j++) {
+                    let p2 = points[j];
+                    let dist = Math.hypot(p.x-p2.x, p.y-p2.y);
+                    if(dist < 210) {
+                        ctx.beginPath(); ctx.moveTo(tx, ty);
+                        ctx.lineTo(p2.x + mouse.x, p2.y + mouse.y); ctx.stroke();
+                    }
+                }
+            });
+            requestAnimationFrame(animate);
+        }
+        init(); animate();
+        window.addEventListener('resize', init);
+    </script>
+</body>
+</html>

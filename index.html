@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Protocolo Cruz Maya — Arquitectura Vital</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@100;300;400&family=Space+Mono&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --black: #0A0A0A;
+            --white: #FFFFFF;
+            --grey-base: 232, 232, 232;
+            --accent: #2E8B57;
+            --font-serif: 'Playfair Display', serif;
+            --font-mono: 'Space Mono', monospace;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background-color: var(--white); color: var(--black); font-family: 'Inter', sans-serif; overflow-x: hidden; }
+
+        #bg-canvas {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -2;
+            background: radial-gradient(circle at center, #ffffff 0%, #e0e0e0 100%);
+        }
+
+        /* --- NAVEGACIÓN SUPERIOR --- */
+        nav.main-nav {
+            position: absolute;
+            top: 40px; right: 50px;
+            display: flex; gap: 35px;
+            z-index: 100;
+        }
+        nav.main-nav a {
+            text-decoration: none;
+            color: var(--black);
+            font-family: var(--font-mono);
+            font-size: 0.65rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            opacity: 0.6;
+        }
+
+        .header-main {
+            height: 38vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .logo-main { width: 230px; height: auto; }
+
+        .editorial-zone {
+            position: relative;
+            padding: 100px 20px;
+            text-align: center;
+            border-top: 1px solid rgba(0,0,0,0.08);
+            background: transparent;
+        }
+        .editorial-zone::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(var(--grey-base), 0.8);
+            backdrop-filter: blur(8px);
+            z-index: -1;
+        }
+
+        .editorial-zone h2 { font-family: var(--font-serif); font-size: 3.2rem; font-weight: 400; margin-bottom: 30px; }
+        .editorial-zone h2 i { color: var(--accent); font-weight: 400; font-style: italic; }
+        .editorial-zone p { max-width: 780px; margin: 0 auto 25px auto; font-size: 1.1rem; line-height: 1.8; color: #1a1a1a; }
+
+        .cta-strip {
+            background-color: var(--black);
+            color: var(--white);
+            padding: 90px 0;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+        .cta-container {
+            max-width: 1100px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 70px;
+        }
+        .luna-tecnica {
+            width: 150px;
+            height: 150px;
+            background: url('https://upload.wikimedia.org/wikipedia/commons/e/e1/FullMoon2010.jpg');
+            background-size: cover;
+            filter: grayscale(100%) brightness(1.2);
+            border-radius: 50%;
+        }
+        .tech-overlay {
+            position: absolute;
+            top: -30px; right: -30px;
+            width: 280px; height: 280px;
+            background: url('img/imagen 2.jpg');
+            background-size: contain;
+            background-repeat: no-repeat;
+            opacity: 0.15;
+            filter: invert(1);
+        }
+
+        .cta-text h3 { font-family: var(--font-serif); font-size: 2.1rem; margin-bottom: 30px; font-weight: 400; }
+        
+        .btn-saber {
+            padding: 14px 40px;
+            border: 1px solid var(--white);
+            color: var(--white);
+            text-decoration: none;
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            letter-spacing: 2px;
+        }
+
+        .options-wrap {
+            max-width: 1200px;
+            margin: 120px auto;
+            display: flex;
+            justify-content: space-between;
+            padding: 0 40px;
+        }
+        .card {
+            width: 31%;
+            padding: 50px 35px;
+            background: rgba(255,255,255,0.4);
+            border: 1px solid rgba(0,0,0,0.04);
+            backdrop-filter: blur(10px);
+        }
+        .card:nth-child(2) { transform: translateY(70px); }
+        .card:nth-child(3) { transform: translateY(-40px); }
+
+        .img-tech {
+            width: 100%;
+            height: 190px;
+            object-fit: contain;
+            margin-bottom: 30px;
+            mix-blend-mode: multiply;
+        }
+
+        .card h4 { font-family: var(--font-serif); font-size: 2rem; margin-bottom: 20px; font-weight: 400; }
+        .card ul { list-style: none; font-family: var(--font-mono); font-size: 0.7rem; color: #444; margin-bottom: 40px; }
+        .card li { padding: 10px 0; border-bottom: 1px solid #eee; }
+
+        /* --- BLOQUE DE BOTONES ALINEADOS --- */
+        .card-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 0; /* Sin espacio extra si queremos toque con toque */
+        }
+
+        .btn-buy {
+            background: var(--black);
+            color: var(--white);
+            display: block;
+            text-align: center;
+            padding: 18px;
+            text-decoration: none;
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            letter-spacing: 2px;
+        }
+        .btn-buy:hover { background: var(--accent); }
+
+        /* --- ESTILOS BOTÓN GENERADOR CÓDIGO --- */
+        .tooltip-container {
+            position: relative;
+            display: block; /* Para que ocupe todo el ancho */
+            width: 100%;
+            margin-top: 2px; /* Pequeño espacio visual para separar si se desea */
+        }
+        .btn-get-code {
+            background: transparent;
+            color: var(--black);
+            border: 1px solid rgba(0,0,0,0.2);
+            display: block;
+            text-align: center;
+            padding: 18px 0;
+            width: 100%;
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+        }
+        .btn-get-code:hover {
+            background: rgba(0,0,0,0.05);
+            border-color: var(--black);
+        }
+        /* Texto que aparece al pasar el mouse */
+        .tooltip-container .tooltiptext {
+            visibility: hidden;
+            width: 220px;
+            background-color: var(--black);
+            color: #fff;
+            text-align: center;
+            border-radius: 4px;
+            padding: 12px;
+            position: absolute;
+            z-index: 100;
+            bottom: 115%; /* Aparece arriba del botón */
+            left: 50%;
+            margin-left: -110px; /* Centrado horizontal (mitad del ancho del tooltip) */
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-family: var(--font-sans);
+            font-size: 0.75rem;
+            line-height: 1.4;
+            pointer-events: none;
+        }
+        .tooltip-container:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+        /* Triangulito del tooltip */
+        .tooltip-container .tooltiptext::after {
+            content: "";
+            position: absolute;
+            top: 100%; /* Parte inferior del tooltip */
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: var(--black) transparent transparent transparent;
+        }
+
+        footer {
+            background-color: var(--black);
+            color: var(--white);
+            padding: 60px 80px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .footer-brand { display: flex; flex-direction: column; align-items: center; }
+        .protocolo-f {
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            letter-spacing: 12.8px;
+            text-transform: uppercase;
+            opacity: 0.5;
+            margin-right: -12.8px;
+            width: 100%;
+            text-align: center;
+        }
+        .cruzmaya-f { font-family: var(--font-serif); font-size: 2.4rem; font-weight: 400; line-height: 1; }
+
+        @media (max-width: 850px) { 
+            .options-wrap { flex-direction: column; gap: 40px; }
+            .card:nth-child(n) { transform: translateY(0); }
+            .btn-get-code { font-size: 0.6rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="bg-canvas"></canvas>
+
+    <nav class="main-nav">
+        <a href="about.html">Nosotros</a>
+        <a href="aprender.html">Aprende</a>
+        <a href="shop.html">Shop</a>
+        <a href="contacto.html">Contacto</a>
+    </nav>
+
+    <header class="header-main">
+        <img src="img/logo.png" alt="Protocolo Cruz Maya" class="logo-main">
+    </header>
+
+    <section class="editorial-zone">
+        <h2>La Geometría de tu <i>Existencia</i></h2>
+        <p>No somos un oráculo; somos un laboratorio de decodificación. A través de la bioneuroemoción y el rigor del Calendario Sagrado, transformamos la incertidumbre en un <b>mapa estructural</b>.</p>
+        <p>Descubre por qué repites patrones y cómo el blindaje energético de tu Nahual puede rediseñar tu realidad física.</p>
+    </section>
+
+    <div class="cta-strip">
+        <div class="tech-overlay"></div>
+        <div class="cta-container">
+            <div class="luna-tecnica"></div>
+            <div class="cta-text">
+                <p style="font-family: var(--font-mono); font-size: 0.7rem; color: var(--accent); letter-spacing: 3px; margin-bottom: 15px;">ANÁLISIS ESTRATÉGICO</p>
+                <h3>Antes de continuar tu experiencia, lee para elegir sabiamente.</h3>
+                <a href="aprender.html" class="btn-saber">SABER MÁS _</a>
+            </div>
+        </div>
+    </div>
+
+    <main class="options-wrap">
+        <div class="card">
+            <img src="img/basica.jpg" alt="Básica" class="img-tech">
+            <h4>Cruz Esencial</h4>
+            <ul>
+                <li>Nahual Central</li>
+                <li>Equilibrio Cardinal</li>
+                <li>Plano Técnico Gratuito</li>
+            </ul>
+            
+            <!-- BLOQUE DE BOTONES ALINEADOS -->
+            <div class="card-actions">
+                <a href="analisis-gratuito.html" class="btn-buy">GENERAR PLANO</a>
+                
+                <div class="tooltip-container">
+                    <button class="btn-get-code" onclick="window.open('https://www.instagram.com/tu_cuenta_aqui', '_blank')">
+                        GENERAR CÓDIGO DE ACCESO
+                    </button>
+                    <span class="tooltiptext">1. Síguenos en Instagram<br>2. Comenta "CRUZ"<br>3. Recibirás tu código único</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <img src="img/individual.jpg" alt="Individual" class="img-tech">
+            <h4>Análisis Individual</h4>
+            <ul>
+                <li>Salud & Blindaje Energético</li>
+                <li>Estrategia de Negocios</li>
+                <li>Propósito de Existencia</li>
+            </ul>
+            <a href="analisis-individual.html" class="btn-buy">AUDITORÍA — $10</a>
+        </div>
+
+        <div class="card">
+            <img src="img/comparativa.jpg" alt="Comparativa" class="img-tech">
+            <h4>Sincronía</h4>
+            <ul>
+                <li>Resonancia de Vínculos</li>
+                <li>Sinergia de Socios</li>
+                <li>Dinámica de 4 Cruces</li>
+            </ul>
+            <a href="analisis-comparativo.html" class="btn-buy">VER VÍNCULO — $18</a>
+        </div>
+    </main>
+
+    <footer>
+        <div class="footer-brand">
+            <span class="protocolo-f">PROTOCOLO</span>
+            <span class="cruzmaya-f">Cruz Maya</span>
+        </div>
+        <div style="display: flex; gap: 30px;">
+            <a href="about.html" style="color:white; opacity:0.3; text-decoration:none; font-family:var(--font-mono); font-size:0.65rem;">NOSOTROS</a>
+            <a href="aprender.html" style="color:white; opacity:0.3; text-decoration:none; font-family:var(--font-mono); font-size:0.65rem;">APRENDE</a>
+            <a href="contacto.html" style="color:white; opacity:0.3; text-decoration:none; font-family:var(--font-mono); font-size:0.65rem;">CONTACTO</a>
+        </div>
+    </footer>
+
+    <script>
+        const canvas = document.getElementById('bg-canvas');
+        const ctx = canvas.getContext('2d');
+        let points = [];
+        let mouse = { x: 0, y: 0 };
+
+        function init() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            points = [];
+            for(let i=0; i<65; i++) {
+                points.push({
+                    x: Math.random()*canvas.width,
+                    y: Math.random()*canvas.height,
+                    vx: (Math.random()-0.5)*0.5,
+                    vy: (Math.random()-0.5)*0.5
+                });
+            }
+        }
+
+        window.addEventListener('mousemove', (e) => {
+            mouse.x = (e.clientX - canvas.width/2) * 0.05;
+            mouse.y = (e.clientY - canvas.height/2) * 0.05;
+        });
+
+        function animate() {
+            ctx.clearRect(0,0,canvas.width, canvas.height);
+            ctx.strokeStyle = "rgba(46, 139, 87, 0.35)"; 
+            ctx.fillStyle = "rgba(0,0,0,0.12)";
+            points.forEach((p, i) => {
+                p.x += p.vx; p.y += p.vy;
+                if(p.x<0 || p.x>canvas.width) p.vx*=-1;
+                if(p.y<0 || p.y>canvas.height) p.vy*=-1;
+                let tx = p.x + mouse.x;
+                let ty = p.y + mouse.y;
+                ctx.beginPath();
+                ctx.arc(tx, ty, 2, 0, Math.PI*2);
+                ctx.fill();
+                for(let j=i+1; j<points.length; j++) {
+                    let p2 = points[j];
+                    let dist = Math.hypot(p.x-p2.x, p.y-p2.y);
+                    if(dist < 210) {
+                        ctx.beginPath();
+                        ctx.moveTo(tx, ty);
+                        ctx.lineTo(p2.x + mouse.x, p2.y + mouse.y);
+                        ctx.stroke();
+                    }
+                }
+            });
+            requestAnimationFrame(animate);
+        }
+
+        init(); animate();
+        window.addEventListener('resize', init);
+    </script>
+</body>
+</html>

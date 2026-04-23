@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sincronía de Energías — Protocolo Cruz Maya</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@200;400&family=Space+Mono&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        :root { --black: #0A0A0A; --white: #FFFFFF; --grey-zone: #EAEAEA; --accent: #2E8B57; --azul: #1a5fa8; --font-serif: 'Playfair Display', serif; --font-mono: 'Space Mono', monospace; --font-sans: 'Inter', sans-serif; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: var(--font-sans); background: var(--white); color: var(--black); line-height: 1.5; }
+        header { padding: 26px 32px; text-align: center; border-bottom: 1px solid #eee; }
+        .logo-header { width: clamp(90px, 15vw, 130px); height: auto; cursor: pointer; }
+        .hero { text-align: center; padding: clamp(28px,5vw,48px) 20px clamp(24px,4vw,36px); border-bottom: 1px solid #eee; background: linear-gradient(180deg,#fafafa,#fff); }
+        .hero-label { font-family: var(--font-mono); font-size: clamp(0.5rem,1.2vw,0.6rem); letter-spacing: 4px; text-transform: uppercase; color: var(--accent); margin-bottom: 10px; }
+        .hero h1 { font-family: var(--font-serif); font-size: clamp(1.5rem,4.5vw,2.4rem); font-weight: 400; margin-bottom: 10px; }
+        .hero h1 i { color: var(--accent); }
+        .hero-nombres { font-family: var(--font-serif); font-style: italic; color: var(--accent); font-size: clamp(0.95rem,2.5vw,1.25rem); margin-bottom: 8px; }
+        .hero-vinculo { font-family: var(--font-serif); font-style: italic; color: var(--accent); font-size: clamp(1.15rem,3vw,1.6rem); font-weight: 400; letter-spacing: 1px; margin-bottom: 0; }
+        .hero-info-strip { background: var(--grey-zone); padding: 14px 20px; margin: 18px -20px -36px; text-align: center; }
+        .strip-dates { font-family: var(--font-serif); font-style: italic; font-size: clamp(0.82rem,1.6vw,0.95rem); color: #555; margin-bottom: 5px; line-height: 1.6; }
+        .strip-emails { font-family: var(--font-mono); font-size: clamp(0.52rem,1vw,0.62rem); color: #999; letter-spacing: 1px; }
+        .sec-titulo { text-align: center; padding: clamp(40px,6vw,60px) 20px 4px; }
+        .sec-titulo h2 { font-family: var(--font-serif); font-size: clamp(1.15rem,3vw,1.7rem); font-weight: 400; margin-bottom: 6px; }
+        .sec-titulo h2 i { color: var(--accent); }
+        .sec-titulo p { font-family: var(--font-mono); font-size: clamp(0.48rem,1vw,0.58rem); letter-spacing: 3px; text-transform: uppercase; color: #bbb; }
+        .sec-linea { width: 44px; height: 1px; background: var(--accent); margin: 12px auto 0; }
+        .cruces-grid { max-width: 1100px; margin: 28px auto 0; display: grid; grid-template-columns: repeat(2,1fr); gap: clamp(28px,4vw,48px) clamp(20px,3vw,36px); padding: 0 clamp(16px,4vw,32px); }
+        @media(max-width:680px){ .cruces-grid{ grid-template-columns:1fr; gap:44px; } }
+        .cruz-bloque { display:flex; flex-direction:column; align-items:center; }
+        .cruz-persona { font-family:var(--font-serif); font-style:italic; color:var(--accent); font-size:clamp(0.95rem,2vw,1.15rem); margin-bottom:3px; text-align:center; }
+        .cruz-sub { font-family:var(--font-mono); font-size:clamp(0.44rem,1vw,0.52rem); letter-spacing:2px; text-transform:uppercase; color:#bbb; margin-bottom:14px; text-align:center; }
+        .cruz-sub-overlay { font-family: var(--font-serif); font-style: italic; color: var(--accent); font-size: clamp(1.3rem, 3.5vw, 1.8rem); font-weight: 400; margin-bottom: 4px; text-align: center; letter-spacing: 0.5px; }
+        .cruz-sub-overlay small { font-family: var(--font-mono); font-size: clamp(0.4rem,0.9vw,0.5rem); letter-spacing: 2px; text-transform: uppercase; color: #bbb; display: block; margin-top: 2px; font-style: normal; }
+        .grid-cruz { display:grid; grid-template-columns: repeat(5, clamp(44px,8.5vw,66px)); grid-template-rows: repeat(5, clamp(44px,8.5vw,66px)); gap: clamp(3px,0.7vw,7px); justify-content:center; }
+        .nawal-item { background:white; border:1.5px solid #ddd; aspect-ratio:1/1; display:flex; flex-direction:column; align-items:center; justify-content:center; transition: border-color 0.2s, background 0.2s; }
+        .nawal-item:hover { background:#f7f7f7; border-color:var(--accent); }
+        .item-center { border:2.5px solid var(--black); }
+        .nawal-img { width:clamp(24px,5vw,38px); height:clamp(24px,5vw,38px); object-fit:contain; }
+        .nawal-label { font-family:var(--font-mono); font-size:clamp(0.32rem,0.8vw,0.48rem); text-transform:uppercase; color:#999; margin-top:2px; text-align:center; line-height:1.1; }
+        .nawal-num { font-family:var(--font-mono); font-weight:bold; font-size:clamp(0.6rem,1.4vw,0.82rem); line-height:1; }
+        .grid-cruz-comp { display:grid; grid-template-columns: repeat(5, clamp(50px, 10vw, 72px)); grid-template-rows: repeat(5, clamp(70px, 14vw, 102px)); gap: clamp(2px, 0.5vw, 5px); justify-content:center; }
+        .grid-cruz-comp .nawal-item { aspect-ratio: unset !important; padding: 2px 1px; }
+        .dual-nawal { display:flex; flex-direction:column; align-items:center; justify-content:center; width:100%; height:100%; gap:0; }
+        .dual-row { display:flex; flex-direction:column; align-items:center; line-height:1; gap:0; flex: 1 1 0%; justify-content:center; }
+        .dual-tag { font-family:var(--font-mono); font-weight:bold; font-size:clamp(0.22rem,0.5vw,0.32rem); letter-spacing:1px; }
+        .tag-a { color:var(--azul); } .tag-b { color:var(--accent); }
+        .nawal-img-dual { width:clamp(14px,2.8vw,22px); height:clamp(14px,2.8vw,22px); object-fit:contain; }
+        .nawal-label-dual { font-family:var(--font-mono); font-size:clamp(0.22rem,0.5vw,0.32rem); text-transform:uppercase; color:#999; text-align:center; line-height:1; }
+        .nawal-num-dual { font-family:var(--font-mono); font-weight:bold; font-size:clamp(0.4rem,0.9vw,0.56rem); line-height:1; }
+        .sep-dual { width:56%; height:1px; background:#e0e0e0; margin:1px 0; flex-shrink:0; }
+        .nar-wrap { max-width:740px; margin:36px auto 0; padding:0 clamp(16px,4vw,28px) 44px; }
+        .nar-header { font-family:var(--font-serif); font-style:italic; font-size:clamp(1.2rem,3vw,1.7rem); color:var(--accent); padding-bottom:9px; border-bottom:1px solid #eee; margin-bottom:18px; text-align:center; }
+        .nar-texto { font-size:clamp(0.9rem,1.8vw,1.04rem); line-height:1.9; color:#222; text-align:justify; hyphens:auto; }
+        .nar-texto p { margin-bottom:0.6em; }
+        .nar-texto strong { font-family:var(--font-serif); font-style:italic; font-weight:700; font-size:1.04em; }
+        .spin-wrap { display:none; text-align:center; padding:26px; font-family:var(--font-mono); font-size:0.6rem; letter-spacing:2px; color:var(--accent); }
+        .spinner { display:inline-block; width:13px; height:13px; border:2px solid #eee; border-top-color:var(--accent); border-radius:50%; animation:giro 0.8s linear infinite; margin-right:7px; vertical-align:middle; }
+        @keyframes giro{ to{transform:rotate(360deg);} }
+        .divisor { max-width:720px; margin:36px auto; border:none; border-top:1px dashed #e0e0e0; }
+        .gray-strip { background:var(--grey-zone); padding:clamp(40px,7vw,80px) 20px; margin-top:60px; text-align:center; }
+        .strip-content { max-width:640px; margin:0 auto; }
+        .strip-content h2 { font-family:var(--font-serif); font-size:clamp(1.2rem,3.5vw,1.85rem); font-weight:400; margin-bottom:12px; }
+        .strip-content h2 i { color:var(--accent); font-style:italic; }
+        .strip-content p { font-size:clamp(0.88rem,1.8vw,1.05rem); line-height:1.8; color:#555; margin-bottom:28px; font-style:italic; }
+        .btn-row { display:flex; gap:12px; justify-content:center; flex-wrap:wrap; }
+        .btn-pdf { background:var(--black); color:white; border:none; padding:clamp(13px,2.5vw,17px) clamp(22px,4.5vw,38px); font-family:var(--font-mono); font-size:clamp(0.6rem,1.3vw,0.68rem); letter-spacing:2px; cursor:pointer; transition:opacity 0.3s; }
+        .btn-pdf:hover{ opacity:0.78; } .btn-pdf:disabled{ opacity:0.35; cursor:not-allowed; }
+        .btn-sec { background:transparent; color:var(--black); border:1px solid var(--black); padding:clamp(13px,2.5vw,17px) clamp(22px,4.5vw,38px); font-family:var(--font-mono); font-size:clamp(0.6rem,1.3vw,0.68rem); letter-spacing:2px; cursor:pointer; transition:all 0.3s; text-decoration:none; display:inline-block; }
+        .btn-sec:hover{ background:var(--black); color:white; }
+        @media(max-width:460px){ .btn-row{ flex-direction:column; align-items:center; } .btn-pdf,.btn-sec{ width:100%; text-align:center; } }
+        footer { padding:48px; text-align:center; font-family:var(--font-mono); font-size:0.56rem; opacity:0.32; border-top:1px solid #eee; }
+    </style>
+</head>
+<body>
+<header><img src="img/logo.png" class="logo-header" onclick="window.location.href='index.html'"></header>
+<div class="hero">
+    <div class="hero-label">Protocolo Cruz Maya · Análisis Comparativo</div>
+    <h1>Sincronía de <i>Energías</i></h1>
+    <div class="hero-nombres" id="hero-nombres">—</div>
+    <div class="hero-vinculo" id="hero-vinculo">—</div>
+    <div class="hero-info-strip" id="hero-info-strip">
+        <div class="strip-dates" id="strip-dates"></div>
+        <div class="strip-emails" id="strip-emails"></div>
+    </div>
+</div>
+<div class="sec-titulo" style="padding-bottom:0;"><h2>Los <i>Protagonistas</i></h2><p>Energía esencial de cada ser</p><div class="sec-linea"></div></div>
+<div style="max-width: 800px; margin: 20px auto 40px; padding: 0 20px; text-align: center; font-style: italic; color: #555;"><p id="intro-esencias"></p></div>
+<div class="sec-titulo" style="padding-top:0;"><h2>Matrices <i>Individuales</i></h2><p>La arquitectura de cada uno</p><div class="sec-linea"></div></div>
+<div class="cruces-grid">
+    <div class="cruz-bloque"><div class="cruz-persona" id="titulo-A">—</div><div class="cruz-sub" id="esencia-A">—</div><div class="grid-cruz" id="cruzGrid-A"></div></div>
+    <div class="cruz-bloque"><div class="cruz-persona" id="titulo-B">—</div><div class="cruz-sub" id="esencia-B">—</div><div class="grid-cruz" id="cruzGrid-B"></div></div>
+</div>
+<div class="sec-titulo" style="padding-top:clamp(50px,8vw,80px);"><h2>Sincronía <i>Comparativa</i></h2><p>Resonancias y tensiones del vínculo</p><div class="sec-linea"></div></div>
+<div class="cruces-grid">
+    <div class="cruz-bloque"><div class="cruz-sub-overlay" id="titulo-AB">—</div><div class="grid-cruz-comp" id="cruzGrid-AB"></div></div>
+    <div class="cruz-bloque"><div class="cruz-sub-overlay" id="titulo-BA">—</div><div class="grid-cruz-comp" id="cruzGrid-BA"></div></div>
+</div>
+<div class="nar-wrap"><div class="spin-wrap" id="spin-AB"><span class="spinner"></span>TEJIENDO SINCRONÍA A/B...</div><div id="bloque-AB" style="display:none"><div class="nar-header" id="hdr-AB">—</div><div class="nar-texto" id="txt-AB"></div></div></div>
+<hr class="divisor">
+<div class="nar-wrap" style="margin-top:0;padding-top:0;"><div class="spin-wrap" id="spin-BA"><span class="spinner"></span>TEJIENDO SINCRONÍA B/A...</div><div id="bloque-BA" style="display:none"><div class="nar-header" id="hdr-BA">—</div><div class="nar-texto" id="txt-BA"></div></div></div>
+<div class="gray-strip">
+    <div class="strip-content">
+        <h2>Has Dado el Paso Más <i>Valioso</i></h2>
+        <p>Guarda con cuidado lo que acabas de recibir. Esta información es una herramienta viva: cuanto más la contemples, más capas irá revelando.</p>
+        <div class="btn-row">
+            <button type="button" class="btn-pdf" id="btn-pdf" onclick="event.preventDefault();generarPDF()" disabled>GENERANDO REPORTE...</button>
+            <a href="aprender.html" class="btn-sec">DAR EL SIGUIENTE PASO</a>
+        </div>
+    </div>
+</div>
+<footer>PROTOCOLO CRUZ MAYA &copy; 2026</footer>
+
+<script src="narrativas/textos.js"></script>
+<script>
+/* ================================================================
+   TRES API KEYS — ROTACIÓN AUTOMÁTICA
+   Carga aquí las tres claves de Google AI Studio
+   ================================================================ */
+const GEMINI_KEYS = [
+    "AIzaSyBtD4zR253GrQedtV45co3Sz5z1CJRwDKc",
+    "AIzaSyCwKlmgratuGeVbvstA85XFsVgGtzaYSt4",
+    "AIzaSyAAIeY2iFEvoMK8xom4tozSJNhu5ujtaRY"
+];
+let _keyIdx = 0;
+function getKey(){ return GEMINI_KEYS[_keyIdx++ % GEMINI_KEYS.length]; }
+
+let tipoVinculo = new URLSearchParams(window.location.search).get('tipo_comparativa') || 'pareja';
+if (tipoVinculo === 'salud') tipoVinculo = 'esencia';
+if (tipoVinculo === 'linaje') tipoVinculo = 'familia';
+if (tipoVinculo === 'amigos') tipoVinculo = 'esencia';
+
+const posicionesCriticas = { pareja: [6, 5, 10, 12, 4, 2], negocios: [7, 0, 11, 1, 6, 8], familia: [10, 12, 9, 11, 6, 3], esencia: [6, 3, 2, 12, 4, 10] };
+const nombresPos = ["Comunicación","Creatividad","Futuro","Concepción","Salud","Fuerza Femenina","ESENCIA","Fuerza Masculina","Protección","Instinto","Pasado","Justicia","Sombra"];
+
+const nawalesConAp=["Imox","Iq'","Aq'ab'al","K'at","Kan","Kame","Kej","Q'anil","Toj","Tz'i'","B'atz'","E'","Aj","I'x","Tz'ikin","Ajmaq","N'oj","Tijax","Kawoq","Ajpu'"];
+const nawalesSinAp=["Imox","IQ","AKBAL","KAT","kan","Kame","Kej","Qanil","Toj","Tzi","Batz","E","Aj","Ix","Tzikin","Ajmaq","Noj","Tijax","Kawoq","Ajpu"];
+const conv={}; nawalesConAp.forEach((n,i)=>conv[n]=nawalesSinAp[i]);
+const cruces={"Imox":["N'oj","Tz'ikin","Toj","Aq'ab'al","Aj","Kej","Imox","Tz'ikin","Toj","Kawoq","Aj","Kej","Kan"],"Iq'":["Tijax","Ajmaq","Tz'i'","Kat","I'x","Qanil","Iq'","Ajmaq","Tz'i'","Ajpu","I'x","Qanil","Kame"],"Aq'ab'al":["Kawoq","N'oj","B'atz'","Kan","Tz'ikin","Toj","Aq'ab'al","N'oj","B'atz'","Imox","Tz'ikin","Toj","Kej"],"K'at":["Ajpu'","Tijax","E'","Kame","Ajmaq","Tz'i'","K'at","Tijax","E'","Iq'","Ajmaq","Tz'i'","Qanil"],"Kan":["Imox","Kawoq","Aj","Kej","N'oj","B'atz'","Kan","Kawoq","Aj","Aq'ab'al","N'oj","B'atz'","Toj"],"Kame":["Iq'","Ajpu'","I'x","Qanil","Tijax","E'","Kame","Ajpu'","I'x","Kat","Tijax","E'","Tz'i'"],"Kej":["Aq'ab'al","Imox","Tz'ikin","Toj","Kawoq","Aj","Kej","Imox","Tz'ikin","Kan","Kawoq","Aj","B'atz'"],"Q'anil":["Kat","Iq'","Ajmaq","Tz'i'","Ajpu'","I'x","Q'anil","Iq'","Ajmaq","Kame","Ajpu'","I'x","E'"],"Toj":["Kan","Aq'ab'al","N'oj","B'atz'","Imox","Tz'ikin","Toj","Aq'ab'al","N'oj","Kej","Imox","Tz'ikin","Aj"],"Tz'i'":["Kame","Kat","Tijax","E'","Iq'","Ajmaq","Tz'i'","Kat","Tijax","Qanil","Iq'","Ajmaq","I'x"],"B'atz'":["Kej","Kan","Kawoq","Aj","Aq'ab'al","N'oj","B'atz'","Kan","Kawoq","Toj","Aq'ab'al","N'oj","Tz'ikin"],"E'":["Qanil","Kame","Ajpu'","I'x","Kat","Tijax","E'","Kame","Ajpu'","Tz'i'","Kat","Tijax","Ajmaq"],"Aj":["Toj","Kej","Imox","Tz'ikin","Kan","Kawoq","Aj","Kej","Imox","B'atz'","Kan","Kawoq","N'oj"],"I'x":["Tz'i'","Qanil","Iq'","Ajmaq","Kame","Ajpu'","I'x","Qanil","Iq'","E'","Kame","Ajpu'","Tijax"],"Tz'ikin":["B'atz'","Toj","Aq'ab'al","N'oj","Kej","Imox","Tz'ikin","Toj","Aq'ab'al","Aj","Kej","Imox","Kawoq"],"Ajmaq":["E'","Tz'i'","Kat","Tijax","Qanil","Iq'","Ajmaq","Tz'i'","Kat","I'x","Qanil","Iq'","Ajpu'"],"N'oj":["Aj","B'atz'","Kan","Kawoq","Toj","Aq'ab'al","N'oj","B'atz'","Kan","Tz'ikin","Toj","Aq'ab'al","Imox"],"Tijax":["I'x","E'","Kame","Ajpu'","Tz'i'","Kat","Tijax","E'","Kame","Ajmaq","Tz'i'","Kat","Iq'"],"Kawoq":["Tz'ikin","Aj","Kej","Imox","B'atz'","Kan","Kawoq","Aj","Kej","N'oj","B'atz'","Kan","Aq'ab'al"],"Ajpu'":["Ajmaq","I'x","Qanil","Iq'","E'","Kame","Ajpu'","I'x","Qanil","Tijax","E'","Kame","Kat"]};
+const numBase=[4,2,9,3,13,7,1,8,2,12,6,13,11];
+const coord={0:{r:0,c:2},1:{r:1,c:1},2:{r:1,c:2},3:{r:1,c:3},4:{r:2,c:0},5:{r:2,c:1},6:{r:2,c:2},7:{r:2,c:3},8:{r:2,c:4},9:{r:3,c:1},10:{r:3,c:2},11:{r:3,c:3},12:{r:4,c:2}};
+
+function jdn(d,m,y){let a=Math.floor((14-m)/12),yy=y+4800-a,mm=m+12*a-3;return d+Math.floor((153*mm+2)/5)+365*yy+Math.floor(yy/4)-Math.floor(yy/100)+Math.floor(yy/400)-32045;}
+function centro(d,m,y){const diff=jdn(d,m,y)-jdn(30,12,1961);let i=((diff%20)+20)%20,t=((diff%13)+13)%13+1;return{nawalConAp:nawalesConAp[i],nawalSinAp:nawalesSinAp[i],tono:t,idx:i};}
+function cruz(c){const lC=cruces[c.nawalConAp];if(!lC)return[];const lS=lC.map(n=>conv[n]||n),aj=(c.tono-1+13)%13,r=[];for(let i=0;i<13;i++){let t=(numBase[i]+aj)%13;if(t===0)t=13;r.push({nawal:lS[i],tono:t,posIndex:i,posNombre:nombresPos[i]});}return r;}
+function trecena(c){return nawalesConAp[(c.idx-(c.tono-1)+20)%20];}
+
+const trecenasElegantes = {
+    "Imox":"La Trecena de Imox te sitúa en el útero cósmico y el mar mental. Si no haces consciente lo que habita en tus aguas profundas, el destino traerá naufragios para obligarte a aprender a nadar. Arquitectónicamente, nacer bajo esta frecuencia es habitar un terreno con napas freáticas altas: si no impermeabilizas tu mente con límites claros, tu estructura emocional se hundirá.",
+    "Iq'":"La Trecena de Iq' rige el aliento, la palabra y el espíritu del cambio. Lo que callas hoy se convertirá en un síntoma mañana; tu palabra es el pincel de tu realidad biológica. Tu diseño es aerodinámico, hecho para el flujo. Si te estancas en ideas rígidas, la presión del estrés derribará tus muros.",
+    "Aq'ab'al":"La Trecena de Aq'ab'al es el umbral donde la luz y la sombra se encuentran. Para que el sol salga en tu vida, debes aceptar la oscuridad que aún guardas en el sótano. Eres una estructura de transición constante.",
+    "K'at":"La Trecena de K'at habla de redes, abundancia y las ataduras invisibles. Tus bloqueos no son falta de suerte, sino una red de lealtades familiares que impiden prosperar para no superar a tus antepasados.",
+    "Kan":"La Trecena de Kan es la serpiente, la energía vital y la justicia interna. Tu diseño tiene una instalación eléctrica de alta tensión; si no tienes una buena toma de tierra basada en la humildad, la potencia de tu nawal quemará tus circuitos internos.",
+    "Kame":"La Trecena de Kame gobierna los ciclos, los ancestros y la muerte simbólica. Morir simbólicamente es soltar el programa del pasado; el perdón libera tu carga biológica. No temas demoler muros viejos para construir lo nuevo.",
+    "Kej":"La Trecena de Kej representa el pilar natural, la fuerza y el liderazgo. Tu necesidad de control es el disfraz de un miedo profundo a la vulnerabilidad. Un pilar que no es flexible se quiebra ante el sismo.",
+    "Q'anil":"La Trecena de Q'anil es la semilla, la realización y el ciclo de la cosecha. Toda semilla contiene el plano del fruto; si tu cosecha es amarga, audita la información del origen.",
+    "Toj":"La Trecena de Toj es el fuego purificador, la ofrenda y el pago de deudas. Lo que llamas mala suerte es a menudo el pago de deudas emocionales no resueltas. Estás compensando lo que otros no sanaron.",
+    "Tz'ikin":"La Trecena de Tz'ikin es la visión panorámica del águila. Tu falta de abundancia no es escasez de recursos, sino miopía emocional. Estás mirando al suelo cuando debes elevar el vuelo para ver la solución.",
+    "Ajmaq":"La Trecena de Ajmaq es el búho, la introspección y la limpieza de culpas. La culpa es un programa de castigo que paraliza tu biología. Perdonar a tus ancestros es dejar de pagar una hipoteca ajena.",
+    "N'oj":"La Trecena de N'oj es el pensamiento estratégico. El exceso de análisis genera parálisis biológica. Tu mente debe ser un puente hacia la acción, no un laberinto donde esconder miedos a decidir.",
+    "Tijax":"La Trecena de Tijax es el cuchillo y la cirugía emocional. La sanación a veces requiere un corte quirúrgico. Liberarse de un vínculo tóxico no es agresividad, es supervivencia biológica.",
+    "Kawoq":"La Trecena de Kawoq es la tormenta y la comunidad. La tormenta viene a mostrar qué partes de tu casa no son sólidas. Asegúrate de que el peso de la comunidad no exceda la carga máxima de tus columnas.",
+    "Ajpu":"La Trecena de Ajpu es el cazador y la luz. Llegar a la cima no es vencer a otros, es vencer tus propios programas de limitación. Eres el sol de tu sistema; si brillas, iluminas la sombra de tu árbol.",
+    "Tz'i'":"La Trecena de Tz'i' rige la lealtad, la autoridad y los límites. Tu dificultad para decir no no es bondad: es un programa de sumisión heredado que tu sistema nervioso confunde con amor.",
+    "B'atz'":"La Trecena de B'atz' es el tejido del tiempo y la creatividad original. No estás aquí para repetir patrones: estás para tejer una nueva trama. Si tu vida se repite, es porque estás usando hilos ajenos.",
+    "E'":"La Trecena de E' marca el camino, la derrota necesaria y la humildad. Tropezar no es fracasar: es la forma que tiene tu biología de corregir el rumbo cuando tu mente se niega a hacerlo.",
+    "Aj":"La Trecena de Aj es el hogar, los pilares y la dirección. Tu inestabilidad no es falta de suerte: es la ausencia de pilares internos. Cuando tu hogar interior no tiene cimientos, cualquier viento exterior te desestabiliza.",
+    "I'x":"La Trecena de I'x es la feminidad profunda, la tierra y la magia natural. Tu poder no está en la fuerza bruta: está en la capacidad de fertilizar lo que tocas. Si tu entorno es estéril, revisa qué estás proyectando."
+};
+
+function mkGrid(g){let gr=Array(5).fill(null).map(()=>Array(5).fill(null));g.forEach(p=>{const pos=coord[p.posIndex];if(pos)gr[pos.r][pos.c]=p;});return gr;}
+function mkImg(nawal,cls){const img=document.createElement('img');img.className=cls;img.src=`nahuales/${nawal}.png`;img.onerror=function(){this.style.display='none';const fb=document.createElement('span');fb.style.cssText='font-size:0.7rem;color:#ccc;';fb.innerText=nawal.charAt(0);this.parentNode.insertBefore(fb,this);};return img;}
+function dibujarIndividual(g,contId){const cont=document.getElementById(contId);cont.innerHTML='';const gr=mkGrid(g);for(let r=0;r<5;r++)for(let c=0;c<5;c++){const it=gr[r][c];if(!it){const e=document.createElement('div');e.style.cssText='visibility:hidden;';cont.appendChild(e);continue;}const card=document.createElement('div');card.className='nawal-item';if(it.posIndex===6)card.classList.add('item-center');const lbl=document.createElement('div');lbl.className='nawal-label';lbl.innerText=it.nawal;const num=document.createElement('div');num.className='nawal-num';num.innerText=it.tono;card.append(mkImg(it.nawal,'nawal-img'),lbl,num);cont.appendChild(card);}}
+function dibujarComparativa(gArr,gAba,contId,tagArr,tagAba){const cont=document.getElementById(contId);cont.innerHTML='';const mA={},mB={};gArr.forEach(p=>mA[p.posIndex]=p);gAba.forEach(p=>mB[p.posIndex]=p);const gr=mkGrid(gArr);for(let r=0;r<5;r++)for(let c=0;c<5;c++){const pi=gr[r][c]?.posIndex;if(pi===undefined||pi===null){const e=document.createElement('div');e.style.cssText='visibility:hidden;';cont.appendChild(e);continue;}const iA=mA[pi],iB=mB[pi];const card=document.createElement('div');card.className='nawal-item';if(pi===6)card.classList.add('item-center');const dual=document.createElement('div');dual.className='dual-nawal';const fila=(it,tag,cls)=>{const row=document.createElement('div');row.className='dual-row';const t=document.createElement('div');t.className=`dual-tag ${cls}`;t.innerText=tag;const lbl=document.createElement('div');lbl.className='nawal-label-dual';lbl.innerText=it.nawal;const num=document.createElement('div');num.className='nawal-num-dual';num.innerText=it.tono;row.append(t,mkImg(it.nawal,'nawal-img-dual'),lbl,num);return row;};const sep=document.createElement('div');sep.className='sep-dual';dual.append(fila(iA,tagArr,'tag-'+tagArr.toLowerCase()),sep,fila(iB,tagAba,'tag-'+tagAba.toLowerCase()));card.appendChild(dual);cont.appendChild(card);}}
+
+let conocBase='';
+async function cargarConoc(){try{const r=await fetch('conocimiento.txt');if(!r.ok)throw new Error();conocBase=await r.text();}catch(e){conocBase='Base de conocimiento no disponible.';}}
+
+function buildPrompt(tipo,cA,gA,nA,trA,cB,gB,nB,trB,vinc){
+    const indices=posicionesCriticas[vinc]||posicionesCriticas.pareja;
+    const resumenA=indices.map(idx=>`- ${nombresPos[idx]}: Nahual ${gA[idx].nawal} (${gA[idx].tono})`).join('\n');
+    const resumenB=indices.map(idx=>`- ${nombresPos[idx]}: Nahual ${gB[idx].nawal} (${gB[idx].tono})`).join('\n');
+    const titulos={pareja:"PAREJA Y RELACIÓN ÍNTIMA",negocios:"NEGOCIOS Y PROYECTOS",familia:"FAMILIA Y LINAJE",esencia:"ESENCIA"};
+    const titulo=titulos[vinc]||"PAREJA";
+    const textoTrA=trecenasElegantes[trA]||"";
+    const textoTrB=trecenasElegantes[trB]||"";
+    let instruccionesTematicas="";
+    if(vinc==='negocios'){instruccionesTematicas=`ENFOQUE ESTRICTO PARA SINASTRÍA DE NEGOCIOS Y SOCIOS:\n- PROHIBIDO usar términos místicos, esotéricos o espirituales (no uses "espacio sagrado", "alma", "vibración").\n- Adapta el lenguaje a un tono ejecutivo, estratégico y comercial.\n- Enfócate EXCLUSIVAMENTE en cómo estas dos energías interactúan en: la toma de decisiones financieras conjuntas, la repartición de roles, la capacidad de cierre de ventas, la delegación, la resolución de crisis operativas y la visión de futuro de la empresa.\n- Traduce las lealtades invisibles y programas inconscientes a "obstaculizadores operativos".\n- Usa los datos del conocimiento proporcionado para explicar por qué hay fricciones de poder, techos de cristal en la empresa o autosabotaje financiero desde la Bioneuroemoción.`;
+    }else if(vinc==='familia'){instruccionesTematicas=`ENFOQUE ESPECÍFICO PARA DINÁMICA FAMILIAR:\n- Enfócate en cómo los programas transgeneracionales de cada uno chocan o se complementan en el entorno familiar.\n- Explica las proyecciones de los padres, las lealtades invisibles entre hermanos y los secretos de clan que se activan en la convivencia.`;
+    }else{instruccionesTematicas=`ENFOQUE PARA PAREJA:\n- Mantén un tono cálido, revelador, enfocado en el espejo emocional y las lecciones que cada uno trae para el otro.`;}
+    const semillas={pareja:`Cierra planteando: ¿qué ocurre en el cuerpo cuando estas dos energías conviven? ¿Qué programa del linaje se activa?`,negocios:`Cierra planteando desde lo ejecutivo: ¿cómo afecta la Justicia de cada uno a los acuerdos comerciales? ¿Hay un programa de escasez heredado saboteando el ROI del proyecto conjunto?`,familia:`Cierra planteando: ¿qué transmite cada uno inconscientemente al otro? ¿Hay lealtades al clan condicionando esta relación?`,esencia:`Cierra planteando: ¿por qué esta persona entró en tu vida? ¿Es un aliado o un maestro disfrazado?`};
+    return `Eres un Analista Senior en Calendario Sagrado Maya y Bioneuroemoción. Usa EXCLUSIVAMENTE este conocimiento:\n ${conocBase}\n\nVÍNCULO: ${titulo}\n ${nA} — Esencia ${cA.nawalConAp} (Tono ${cA.tono}) · Trecena ${trA}. Contexto: ${textoTrA}\n ${nB} — Esencia ${cB.nawalConAp} (Tono ${cB.tono}) · Trecena ${trB}. Contexto: ${textoTrB}\n\nPosiciones clave (úsalas como guía interna):\nCRUZ DE ${nA}:\n${resumenA}\nCRUZ DE ${nB}:\n${resumenB}\n\n ${instruccionesTematicas}\n\nINSTRUCCIONES para el análisis desde la perspectiva de ${tipo==='AB'?nA:nB}:\n- Escribe una narrativa continua fluida. No enumeres posiciones.\n- Explica cómo se complementan o se tensionan estas dos arquitecturas.\n- Menciona los nombres ${nA} y ${nB} naturalmente.\n- Incluye una analogía arquitectónica. Título en **negrita**.\n- Extensión: 800 palabras.\n\n ${semillas[vinc]||semillas.pareja}\nEscribe el informe:`;
+}
+
+/* ================================================================
+   LLAMADA A GEMINI CON REINTENTOS AUTOMÁTICOS Y ROTACIÓN DE KEYS
+   ================================================================ */
+async function llamarGemini(prompt){
+    for(let i=0;i<5;i++){
+        try{
+            const r=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=${getKey()}`,{
+                method:'POST',headers:{'Content-Type':'application/json'},
+                body:JSON.stringify({contents:[{parts:[{text:prompt}]}],generationConfig:{temperature:0.88,maxOutputTokens:4000}})
+            });
+            if(r.status===429){const w=Math.pow(10,i+1)*1000;console.warn(`429 Rate limit. Reintento ${i+1}/5 en ${w/1000}s`);await new Promise(res=>setTimeout(res,w));continue;}
+            if(r.status===503){const w=Math.pow(8,i+1)*1000;console.warn(`503 Sobrecarga. Reintento ${i+1}/5 en ${w/1000}s`);await new Promise(res=>setTimeout(res,w));continue;}
+            if(!r.ok){const e=await r.json();console.error('GEMINI ERROR:',JSON.stringify(e,null,2));throw new Error(e.error?.message||'Error Gemini');}
+            const d=await r.json();return d.candidates?.[0]?.content?.parts?.[0]?.text||'';
+        }catch(err){if(i===4)throw err;console.warn(`Error red. Reintento ${i+1}/5 en 4s`);await new Promise(res=>setTimeout(res,4000));}
+    }
+    return '';
+}
+
+function a2html(t){return t.split('\n\n').filter(p=>p.trim()).map(p=>{p=p.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>');return`<p>${p.trim()}</p>`;}).join('');}
+
+let dA={},dB={},cA,cB,gA,gB,nar={AB:'',BA:''};
+
+async function iniciar(){
+    await cargarConoc();
+    const p=new URLSearchParams(window.location.search);
+    const nA=p.get('nombreA')||'Persona A',diaA=+p.get('diaA'),mesA=+p.get('mesA'),anioA=+p.get('anioA');
+    const nB=p.get('nombreB')||'Persona B',diaB=+p.get('diaB'),mesB=+p.get('mesB'),anioB=+p.get('anioB');
+    const email=p.get('email')||'';
+    let vinc=p.get('tipo_comparativa')||'pareja';
+    if(vinc==='salud')vinc='esencia'; if(vinc==='linaje')vinc='familia'; if(vinc==='amigos')vinc='esencia';
+    if(isNaN(diaA)||isNaN(diaB)){document.getElementById('hero-vinculo').innerText='Error: faltan datos.';return;}
+    dA={nombre:nA,dia:diaA,mes:mesA,anio:anioA,email:email}; dB={nombre:nB,dia:diaB,mes:mesB,anio:anioB,email:email};
+    const meses=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+    document.getElementById('hero-nombres').innerText=`${nA}  ·  ${nB}`;
+    document.getElementById('hero-vinculo').innerText=vinc.toUpperCase();
+    document.getElementById('strip-dates').innerHTML=`${nA} — ${diaA} de ${meses[mesA-1]} de ${anioA}<br>${nB} — ${diaB} de ${meses[mesB-1]} de ${anioB}`;
+    if(email){document.getElementById('strip-emails').innerText=email;}else{document.getElementById('strip-emails').style.display='none';}
+    document.getElementById('titulo-A').innerText=nA; document.getElementById('titulo-B').innerText=nB;
+    const pA=nA.split(' ')[0],pB=nB.split(' ')[0];
+    document.getElementById('titulo-AB').innerHTML=`${pA} <i>/</i> ${pB}<small>Sincronía Comparativa</small>`;
+    document.getElementById('titulo-BA').innerHTML=`${pB} <i>/</i> ${pA}<small>Sincronía Comparativa</small>`;
+    cA=centro(diaA,mesA,anioA); gA=cruz(cA); cB=centro(diaB,mesB,anioB); gB=cruz(cB);
+    const trA=trecena(cA),trB=trecena(cB);
+    document.getElementById('esencia-A').innerHTML=`${cA.nawalConAp} · Tono ${cA.tono} · Trecena ${trA}`;
+    document.getElementById('esencia-B').innerHTML=`${cB.nawalConAp} · Tono ${cB.tono} · Trecena ${trB}`;
+    document.getElementById('intro-esencias').innerHTML=`<strong>${nA}:</strong> ${cA.nawalConAp} (Tono ${cA.tono}) bajo la Trecena de ${trA}<br><strong>${nB}:</strong> ${cB.nawalConAp} (Tono ${cB.tono}) bajo la Trecena de ${trB}`;
+    dibujarIndividual(gA,'cruzGrid-A'); dibujarIndividual(gB,'cruzGrid-B');
+    dibujarComparativa(gA,gB,'cruzGrid-AB','A','B'); dibujarComparativa(gB,gA,'cruzGrid-BA','B','A');
+    document.getElementById('hdr-AB').innerHTML=`${pA} / ${pB}`;
+    document.getElementById('hdr-BA').innerHTML=`${pB} / ${pA}`;
+    const btn=document.getElementById('btn-pdf'); btn.disabled=false; btn.textContent='DESCARGAR REPORTE PDF';
+    if(GEMINI_KEYS[0]&&GEMINI_KEYS[0].length>20){
+        const pasos=[{k:'AB',sp:'spin-AB',bl:'bloque-AB',tx:'txt-AB'},{k:'BA',sp:'spin-BA',bl:'bloque-BA',tx:'txt-BA'}];
+        for(let idx=0;idx<pasos.length;idx++){const paso=pasos[idx];document.getElementById(paso.sp).style.display='block';
+        if(idx>0)await new Promise(r=>setTimeout(r,5000));
+        try{const t=await llamarGemini(buildPrompt(paso.k,cA,gA,nA,trA,cB,gB,nB,trB,vinc));nar[paso.k]=t;document.getElementById(paso.tx).innerHTML=a2html(t);}
+        catch(e){document.getElementById(paso.tx).innerHTML=`<p style="color:#c0392b;">Error al generar la narrativa: ${e.message}</p>`;}
+        document.getElementById(paso.sp).style.display='none';document.getElementById(paso.bl).style.display='block';}
+    }
+}
+
+/* ================================================================
+   CONCLUSIONES DINÁMICAS — Basadas en conocimiento.txt
+   ================================================================ */
+function generarConclusion(vinc,cA,cB,nA,nB,trA,trB,gA,gB){
+    const pA=nA.split(' ')[0],pB=nB.split(' ')[0];
+    const sombraA=gA[12],sombraB=gB[12],pasadoA=gA[10],pasadoB=gB[10];
+    const femA=gA[5],femB=gB[5],justiciaA=gA[11],justiciaB=gB[11];
+    const futuroA=gA[2],futuroB=gB[2],protA=gA[7],protB=gB[7];
+    const saludA=gA[4],saludB=gB[4],comA=gA[0],comB=gB[0];
+    const h=(cA.idx*7+cB.idx*13+['pareja','negocios','familia','esencia'].indexOf(vinc)*3+cA.tono+cB.tono)%100;
+
+    const aperturas={
+        pareja:[
+            `Lo que esta sincronía ha revelado no es una compatibilidad: es un diagnóstico de los programas biográficos que se activan cuando ${pA} (${cA.nawalConAp}, Tono ${cA.tono}) y ${pB} (${cB.nawalConAp}, Tono ${cB.tono}) comparten espacio vital. Sus sistemas nerviosos no se atrajeron por afinidad superficial: cada uno portaba la pieza que el árbol genealógico del otro necesitaba para completar un ciclo inconcluso. En bioneuroemoción esto se llama resonancia familiar: atraen a personas que vibran en la misma frecuencia que sus heridas no resueltas.`,
+            `Hay un dato que esta sincronía expone con precisión: la Trecena de ${trA} que envuelve a ${pA} y la Trecena de ${trB} que rodea a ${pB} no son climas separados. Cuando estas dos frecuencias se encuentran, generan un microclima específico que determina cómo cada uno procesa la presencia del otro a nivel biológico. No es poesía: es un programa de coincidencia que el inconsciente biológico de ambos activó para resolver algo que individualmente no podían.`,
+            `La arquitectura de ${cA.nawalConAp} en Tono ${cA.tono} conjugada con ${cB.nawalConAp} en Tono ${cB.tono} constituye un circuito donde lo que cada uno rechaza del otro es, con alta probabilidad, la información que su propia estructura se niega a integrar. La pareja, según el conocimiento posicional, no es un espejo metafórico: es la prueba de carga que revela dónde las vigas internas están débiles o dónde el diseño está desequilibrado.`
+        ],
+        negocios:[
+            `Lo que este cruce ha revelado no es una evaluación de compatibilidad comercial: es un diagnóstico operativo de los programas inconscientes que ${pA} (${cA.nawalConAp}, Tono ${cA.tono}) y ${pB} (${cB.nawalConAp}, Tono ${cB.tono}) activan al compartir decisiones financieras. Un socio, según la filosofía de este protocolo, es un refuerzo estructural: si la unión no está bien calculada en coherencia, la vibración de uno terminará por agrietar la pared del otro.`,
+            `La Trecena de ${trA} que envuelve a ${pA} y la Trecena de ${trB} que rodea a ${pB} determinan el clima operativo de cualquier proyecto que emprendan juntos. ${cA.nawalConAp} en Tono ${cA.tono} y ${cB.nawalConAp} en Tono ${cB.tono} forman un circuito donde la tensión no es un problema relacional sino un indicador biográfico: cada punto de fricción operativa señala un programa heredado con un costo real medible en resultados.`,
+            `El dato más valioso de esta sincronía comercial no está en las coincidencias: está en las fricciones. ${pA} y ${pB} han formado un circuito donde la tensión en la toma de decisiones bajo presión tiene una firma biográfica específica que, si la observan con atención, reconocerán en las dinámicas de sus respectivos linajes. No hay culpables, hay programas.`
+        ],
+        familia:[
+            `Lo que esta sincronía familiar ha puesto en evidencia no es un conflicto entre ${pA} y ${pB}: es la colisión de dos programas transgeneracionales que portan y ejecutan de forma automática. ${cA.nawalConAp} en Tono ${cA.tono} bajo la Trecena de ${trA} y ${cB.nawalConAp} en Tono ${cB.tono} bajo la Trecena de ${trB} constituyen dos frecuencias que al encontrarse generan un patrón de interferencia que se repite generación tras generación dentro del clan.`,
+            `Este cruce no describe quién tiene razón en la dinámica familiar: describe qué programa biográfico está operando en cada momento de tensión. ${pA}, con su ${cA.nawalConAp} en Tono ${cA.tono}, porta un patrón de lealtad ancestral que choca con el mecanismo de defensa de ${pB} (${cB.nawalConAp}, Tono ${cB.tono}). El resultado es una dinámica predecible que ninguno de los dos eligió pero que su sistema nervioso ejecuta como si fuera una orden del clan.`,
+            `El análisis más revelador de esta sincronía es que ${pA} y ${pB} no están respondiendo el uno al otro: están respondiendo a fantasmas genealógicos que solo se vuelven visibles cuando dos arquitecturas como estas se encuentran. La Sombra, el Pasado y la Fuerza Femenina de cada uno contienen las coordenadas exactas de qué programa del clan se activa en cada momento de conflicto.`
+        ],
+        esencia:[
+            `Lo que este cruce de esencias ha revelado es que ${pA} (${cA.nawalConAp}, Tono ${cA.tono}) y ${pB} (${cB.nawalConAp}, Tono ${cB.tono}) no se cruzaron al azar. Hay un código biográfico compartido que hizo que sus sistemas se reconocieran. En bioneuroemoción, esto no se lee como destino: se lee como un programa de coincidencia que el inconsciente biológico de ambos activó para resolver algo que individualmente no podían.`,
+            `Este análisis no describe afinidad: describe una resonancia estructural. ${cA.nawalConAp} en Tono ${cA.tono} bajo la Trecena de ${trA} y ${cB.nawalConAp} en Tono ${cB.tono} bajo la Trecena de ${trB} constituyen dos frecuencias que al encontrarse generan un patrón de interferencia específico. Ese patrón es lo que experimentan como conexión, y tiene una explicación biográfica precisa que solo un cruce de mayor profundidad puede develar.`,
+            `La pregunta más incisiva que este cruce deja abierta es por qué la arquitectura de ${cA.nawalConAp} reconoció en ${cB.nawalConAp} una frecuencia complementaria. El sistema nervioso de cada uno detectó en el otro un programa que su árbol genealógico necesitaba completar, corregir o confrontar. Lo que sigue es determinar en qué terreno esa resonancia se vuelve operativa.`
+        ]
+    };
+
+    const desarrollos={
+        pareja:[
+            `La Sombra de ${pA} (${sombraA.nawal}, Tono ${sombraA.tono}) y la de ${pB} (${sombraB.nawal}, Tono ${sombraB.tono}) constituyen el sótano de esta dinámica. Bajo la Ley del Espejo, lo que ${pA} juzga como resistencia en ${pB} es la parte de su propio plano estructural que quedó excluida por mandato familiar. A esto se suma que el Pasado de ${pA} (${pasadoA.nawal}, Tono ${pasadoA.tono}) arrastra lealtades invisibles de sus abuelos, mientras que el Pasado de ${pB} (${pasadoB.nawal}, Tono ${pasadoB.tono}) porta dramas no cerrados de su propio clan. Un cruce de linaje individual de ${pA} identificaría qué ancestro instaló esa exclusión y qué secreto del clan obliga a su sistema a proyectarla sobre ${pB}.`,
+            `El equilibrio entre la Fuerza Femenina de ${pA} (${femA.nawal}, Tono ${femA.tono}) y la Fuerza Masculina de ${pB} (${protB.nawal}, Tono ${protB.tono}) revela algo que ninguna terapia relacional puede detectar sin este mapa: cómo se distribuye la carga emocional y operativa dentro del vínculo. Si la Fuerza Femenina de ${pA} está en sombra, su sistema prioriza las necesidades de ${pB} para evitar una separación con peligro grabada en su linaje. Si la Fuerza Masculina de ${pB} opera desde el estrés del cordero separado del rebaño, sus decisiones se tomarán por pánico a la escasez. Un cruce de linaje individual revelaría de qué ancestro proviene esa descompensación de carga.`,
+            `La Justicia de ${pA} (${justiciaA.nawal}, Tono ${justiciaA.tono}) y la de ${pB} (${justiciaB.nawal}, Tono ${justiciaB.tono}) funcionan como el fisco del alma de esta relación. Si uno vive en estado de sacrificio perpetuo, es una grieta que indica una deuda emocional transgeneracional: está pagando una factura de una obra que no es suya. Paralelamente, el Futuro de ${pA} (${futuroA.nawal}, Tono ${futuroA.tono}) y el de ${pB} (${futuroB.nawal}, Tono ${futuroB.tono}) muestran si el propósito compartido está alineado o si uno procrastina el crecimiento por miedo a superar el techo de cristal del clan. Un cruce de linaje de cada uno identificaría la deuda específica y el ancestro que la originó.`,
+            `La coherencia entre la Comunicación de ${pA} (${comA.nawal}, Tono ${comA.tono}) y su Esencia (${cA.nawalConAp}) es lo que el conocimiento denomina alinear el plano de marketing con el plano de ingeniería. Si ${pA} muestra al mundo una fachada que no corresponde a su estructura interna, el estrés biológico por falta de autenticidad se transmite directamente al vínculo con ${pB}. La Salud de ${pB} (${saludB.nawal}, Tono ${saludB.tono}) gestiona la vitalidad y los límites corporales: si está bloqueada, ${pB} se siente invadido en su territorio íntimo. Un cruce de linaje individual revelaría en qué punto de la historia familiar se produjo esa desconexión.`
+        ],
+        negocios:[
+            `La Justicia de ${pA} (${justiciaA.nawal}, Tono ${justiciaA.tono}) gestiona la reciprocidad y el equilibrio de dar y recibir en la alianza. Si opera desde el patrón del pagador, la rentabilidad del proyecto estará comprometida por un programa de sacrificio que no pertenece a la empresa sino al clan de ${pA}. La Protección de ${pB} (${protB.nawal}, Tono ${protB.tono}) muestra si hay porosidad sistémica: si está en tensión, ${pB} no tiene límites operativos y absorbe los conflictos como si fueran propios, generando una falla de aislamiento que viene de una infancia de hiper-vigilancia. Un cruce de linaje individual mapearía el origen exacto de estos programas obstructores.`,
+            `El Futuro de ${pA} (${futuroA.nawal}, Tono ${futuroA.tono}) y el de ${pB} (${futuroB.nawal}, Tono ${futuroB.tono}) definen el horizonte de éxito compartido. Si no están alineados, surge la procrastinación vincular donde la pareja se aferra a lo negativo para no enfrentar la incertidumbre del crecimiento. La Fuerza Masculina de ${pA} (${protA.nawal}, Tono ${protA.tono}) rige la capacidad de ejecución: si está debilitada, las decisiones se toman por pánico a la escasez. La Sombra de ${pB} (${sombraB.nawal}, Tono ${sombraB.tono}) contiene los esqueletos familiares que pueden sabotear los acuerdos. Un cruce individual revelaría si ese patrón viene del duelo no gestionado de un padre con su propio éxito.`,
+            `Cuando la Esencia de ${pA} (${cA.nawalConAp}, Tono ${cA.tono}) colisiona con la de ${pB} (${cB.nawalConAp}, Tono ${cB.tono}), el síntoma conductual es la lucha de territorio dentro del proyecto. La Comunicación de ${pA} (${comA.nawal}, Tono ${comA.tono}) y la de ${pB} (${comB.nawal}, Tono ${comB.tono}) rigen la capacidad de negociación: si hubo secretos graves en el clan de alguno, su comunicación será difusa para no revelar inconscientemente lo que debe quedar oculto. Un cruce de linaje individual identificaría qué secreto del clan está operando como carga muerta sobre la alianza comercial.`
+        ],
+        familia:[
+            `El Pasado de ${pA} (${pasadoA.nawal}, Tono ${pasadoA.tono}) custodia las lealtades invisibles y los dramas no cerrados de sus abuelos. Si ${pA} siente que debe sostener al clan olvidándose de su propio diseño, es el Conflicto del Nido operando en tiempo real. La Fuerza Femenina de ${pB} (${femB.nawal}, Tono ${femB.tono}) muestra cómo se vive el territorio emocional: si está en sombra, ${pB} prioriza las necesidades ajenas para evitar una separación con peligro grabada en su linaje. Un cruce de linaje individual de ${pA} revelaría qué abuelo instaló esa lealtad y qué drama no cerrado la alimenta.`,
+            `La Sombra de ${pA} (${sombraA.nawal}, Tono ${sombraA.tono}) y la de ${pB} (${sombraB.nawal}, Tono ${sombraB.tono}) son los sótanos donde residen las vergüenzas humanas y los esqueletos familiares. Cuando un Nahual potente cae aquí, indica que la persona tiene un poder inmenso pero lo vive como un castigo. La Justicia de ${pA} (${justiciaA.nawal}, Tono ${justiciaA.tono}) funciona como auditor del alma: si hay una deuda moral o financiera heredada del linaje, ${pA} vivirá en sacrificio perpetuo dentro de la dinámica familiar. Un cruce de linaje individual identificaría la deuda específica y el ancestro originario.`,
+            `La Salud de ${pA} (${saludA.nawal}, Tono ${saludA.tono}) gestiona la vitalidad y los límites corporales. Si está bloqueada, ${pA} se siente invadido en su territorio íntimo, generando frialdad afectiva. La Comunicación de ${pB} (${comB.nawal}, Tono ${comB.tono}) rige la capacidad de decir la verdad dentro del sistema familiar: si hubo secretos graves en el clan, será difusa para no revelar lo que debe quedar oculto. El Pasado de ${pB} (${pasadoB.nawal}, Tono ${pasadoB.tono}) arrastra el Conflicto del Heredero Universal: si ocupó el lugar de un abuelo que perdió la fortuna, su inconsciente saboteará el éxito. Un cruce de linaje individual desenmascararía el secreto y el mandato de silencio.`
+        ],
+        esencia:[
+            `La Esencia de ${pA} (${cA.nawalConAp}, Tono ${cA.tono}) es su identidad más profunda, y la Concepción de ${pB} (${gB[3].nawal}, Tono ${gB[3].tono}) revela el clima emocional en que fue gestado. Si la Concepción marca un proyecto sentido, una compensación por una pérdida familiar previa, su resonancia con ${pA} no es casual: porta la frecuencia que el sistema de ${pB} necesita para completar ese programa. Un cruce de linaje de ${pB} revelaría si es un hijo sustituto y de qué pérdida específica está intentando compensar.`,
+            `El Pasado de ${pA} (${pasadoA.nawal}, Tono ${pasadoA.tono}) y la Sombra de ${pB} (${sombraB.nawal}, Tono ${sombraB.tono}) contienen las coordenadas del encuentro. Si ${pA} es un doble energético de un ancestro y la Sombra de ${pB} alberga un secreto no revelado, la resonancia entre ambos no es amistad: es un mecanismo de detección que el inconsciente de ${pB} activó para que ese secreto salga a la luz a través de ${pA}. La Justicia de ${pA} (${justiciaA.nawal}, Tono ${justiciaA.tono}) muestra si hay una deuda transgeneracional operando. Un cruce de linaje individual identificaría el secreto y el ancestro originario.`,
+            `El Futuro de ${pA} (${futuroA.nawal}, Tono ${futuroA.tono}) y la Justicia de ${pB} (${justiciaB.nawal}, Tono ${justiciaB.tono}) muestran si este encuentro tiene un propósito operativo o si uno aporta la energía mientras el otro ejecuta un programa de limitación. Si el Futuro de ${pA} choca con el techo de cristal del clan y la Justicia de ${pB} opera desde el sacrificio, la dinámica quedará estancada. La Fuerza Femenina de ${pA} (${femA.nawal}, Tono ${femA.tono}) y la Protección de ${pB} (${protB.nawal}, Tono ${protB.tono}) determinan si hay porosidad sistémica en el vínculo. Un cruce de linaje individual rompería el bucle al identificar el origen exacto del programa.`
+        ]
+    };
+
+    const cierres={
+        pareja:[
+            `Guardar este documento sin solicitar los cruces de familia y linaje de ${pA} y ${pB} equivaldría a tener una radiografía que identifica algo operable y decidir archivarla. Lo que han leído es la primera capa de un mapa que tiene al menos tres niveles de profundidad. El siguiente nivel, el cruce de linaje individual, no amplía lo que ya saben: abre una dimensión completamente diferente que, con alta probabilidad, cambiará la forma en que entienden por qué están juntos y qué programa ancestral están ejecutando sin saberlo.`,
+            `Lo que tienen entre manos no es una lectura: es un primer plano arquitectónico. Los planos siguientes, el cruce de linaje individual de ${pA} y el de ${pB}, mostrarían los cimientos que sostienen esta estructura. Sin ellos, están construyendo sobre un terreno que no han auditado. La pregunta no es si vale la pena ver los cimientos: es qué ocurre si siguen construyendo sin hacerlo.`
+        ],
+        negocios:[
+            `Guardar este análisis sin solicitar los cruces individuales de linaje de ${pA} y ${pB} equivaldría a tener un estudio de mercado que identifica una brecha y decidir no actuar. La información que falta no es complementaria: es la que transforma este diagnóstico en ventaja competitiva. Sin mapear el origen biográfico de estos programas obstructores, cada crisis operativa será más costosa de lo necesario.`,
+            `Este documento es un escáner operativo, no un certificado de compatibilidad. Los cruces individuales de ${pA} y ${pB} son los que convierten el diagnóstico en protocolo. Sin ellos, el techo de crecimiento del proyecto seguirá determinado por programas que nadie en la empresa puede ver pero que todos ejecutan. La diferencia es que mientras el balance muestra dónde está el dinero, el cruce muestra dónde está el programa que lo bloquea.`
+        ],
+        familia:[
+            `Lo que este cruce ha trazado es el contorno de un patrón que se extiende más allá de ${pA} y ${pB}. Los cruces individuales de familia y linaje no añaden información: revelan el origen. Y cuando se conoce el origen, el patrón pierde su poder de repetición porque deja de ser invisible. Esa es la diferencia entre entender el problema y tener la llave para desactivarlo.`,
+            `Guardar este análisis sin profundizar en los linajes individuales sería como identificar un programa corrupto en un sistema y decidir convivir con él. Los cruces de ${pA} y de ${pB} son los que permiten acceder al código fuente y reescribirlo. La dinámica familiar no cambia con intención: cambia cuando el programa deja de ser invisible.`
+        ],
+        esencia:[
+            `Este cruce de esencias es una puerta de entrada, no una conclusión. Lo que ${pA} y ${pB} han visto aquí se expande exponencialmente al agregar un cruce de pareja, familia o negocios, y alcanza su máxima resolución con los cruces individuales de linaje. Cada capa no repite la anterior: abre una dimensión nueva del mapa que las anteriores no podían ver.`,
+            `La esencia revela el qué, no el para qué. Para entender por qué ${cA.nawalConAp} y ${cB.nawalConAp} se reconocieron, hace falta el siguiente plano: un cruce contextual que determine en qué campo de la vida esa resonancia se vuelve operativa. Y para entender de dónde viene, hace falta el cruce de linaje individual. Cada paso no acumula información: cambia la perspectiva completa del mapa.`
+        ]
+    };
+
+    const poolA=aperturas[vinc]||aperturas.pareja;
+    const poolD=desarrollos[vinc]||desarrollos.pareja;
+    const poolC=cierres[vinc]||cierres.pareja;
+    return poolA[h%poolA.length]+'\n\n'+poolD[(h*3+1)%poolD.length]+'\n\n'+poolC[(h*7+2)%poolC.length];
+}
+
+/* ================================================================
+   GENERACIÓN PDF
+   ================================================================ */
+async function generarPDF(){
+    try{
+    const btn=document.getElementById('btn-pdf'); btn.disabled=true; btn.textContent='GENERANDO...';
+    const {jsPDF}=window.jspdf; const doc=new jsPDF('p','mm','a4');
+    const pW=doc.internal.pageSize.getWidth(),pH=doc.internal.pageSize.getHeight();
+    const mI=22,mD=22,aU=pW-mI-mD; const fH=16,seg=pH-fH-12; let y=30;
+    const meses=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+    let vincRaw=new URLSearchParams(window.location.search).get('tipo_comparativa')||'pareja';
+    if(vincRaw==='salud')vincRaw='esencia'; if(vincRaw==='linaje')vincRaw='familia'; if(vincRaw==='amigos')vincRaw='esencia';
+    const vinc=vincRaw.toUpperCase();
+    const pA=dA.nombre.split(' ')[0],pB=dB.nombre.split(' ')[0];
+
+    const logo=await new Promise(res=>{const img=new Image();img.onload=()=>{const c=document.createElement('canvas');c.width=img.width;c.height=img.height;c.getContext('2d').drawImage(img,0,0);res({d:c.toDataURL('image/png'),w:img.width,h:img.height});};img.onerror=()=>res(null);img.src='img/logo.png';});
+    const firmaImg=await new Promise(res=>{const img=new Image();img.onload=()=>{const c=document.createElement('canvas');c.width=img.width;c.height=img.height;c.getContext('2d').drawImage(img,0,0);res({d:c.toDataURL('image/png'),w:img.width,h:img.height});};img.onerror=()=>res(null);img.src='img/firma.png';});
+
+    const pie=()=>{const fy=pH-fH+3;doc.setDrawColor(210,210,210);doc.setLineWidth(0.2);doc.line(mI,fy-3,pW-mD,fy-3);doc.setFontSize(7.5);doc.setFont('helvetica','normal');doc.setTextColor(46,139,87);doc.text('protocolo.cruzmaya@gmail.com',mI,fy);doc.setTextColor(160,160,160);doc.text(`Pagina ${doc.internal.getNumberOfPages()}`,pW-mD,fy,{align:'right'});};
+    const lmp=t=>t?t.replace(/<[^>]*>/g,'').replace(/[\u2018\u2019\u201C\u201D]/g,"'").replace(/[^\x20-\x7E\u00A0-\u00FF]/g,'').trim():'';
+    const par=(txt,fs,ff,fst,col,x=mI,indent=0,spacing=6)=>{const t=lmp(txt);if(!t)return;doc.setFontSize(fs);doc.setFont(ff,fst);doc.setTextColor(col[0],col[1],col[2]);const xReal=x+indent,anchoReal=aU-indent;const aL=fs*0.3527*1.62;const palabras=t.split(/\s+/);if(!palabras.length)return;const lineas=[];let linea=[];for(const p of palabras){const test=[...linea,p].join(' ');if(doc.getTextWidth(test)>anchoReal&&linea.length>0){lineas.push([...linea]);linea=[p];}else{linea.push(p);}}if(linea.length)lineas.push(linea);const espNormal=doc.getTextWidth(' ');const maxEsp=espNormal*2.2;for(let i=0;i<lineas.length;i++){const esUlt=(i===lineas.length-1);const pals=lineas[i];if(y+aL>seg){doc.addPage();pie();y=38;doc.setFontSize(fs);doc.setFont(ff,fst);doc.setTextColor(col[0],col[1],col[2]);}if(esUlt||pals.length<=1){doc.text(pals.join(' '),xReal,y);}else{let anchoP=0;const anchos=pals.map(p=>{const w=doc.getTextWidth(p);anchoP+=w;return w;});const espExtra=(anchoReal-anchoP)/(pals.length-1);if(espExtra>maxEsp){doc.text(pals.join(' '),xReal,y);}else{let xp=xReal;for(let j=0;j<pals.length;j++){doc.text(pals[j],xp,y);xp+=anchos[j]+espExtra;}}}y+=aL;}y+=spacing;};
+    const salt=(h,minR=30)=>{if(y+h>seg||seg-y<minR){doc.addPage();pie();y=38;}};
+
+    /* ===== PÁGINA 1 — PORTADA ===== */
+    pie();
+    if(logo){const lw=68,lh=lw*(logo.h/logo.w);doc.addImage(logo.d,'PNG',(pW-lw)/2,y,lw,lh);y+=lh+16;}
+    doc.setFontSize(24);doc.setFont('times','italic');doc.setTextColor(10,10,10);doc.text('Sincronia de Energias',pW/2,y,{align:'center'});y+=14;
+    doc.setFontSize(18);doc.setFont('times','italic');doc.setTextColor(46,139,87);doc.text(`${dA.nombre}  \u00b7  ${dB.nombre}`,pW/2,y,{align:'center'});y+=12;
+    /* PAREJA — MISMA TIPOGRAFÍA QUE EL TEXTO VERDE: times italic, color accent */
+    doc.setFontSize(16);doc.setFont('times','italic');doc.setTextColor(46,139,87);doc.text(vinc,pW/2,y,{align:'center'});y+=10;
+    doc.setDrawColor(46,139,87);doc.setLineWidth(0.3);doc.line(mI+15,y,pW-mD-15,y);y+=10;
+    /* Tira gris con fechas y email */
+    const stripH=dA.email?30:22;
+    doc.setFillColor(234,234,234);doc.rect(mI,y,aU,stripH,'F');y+=8;
+    doc.setFontSize(9.5);doc.setFont('times','italic');doc.setTextColor(60,60,60);
+    doc.text(`${dA.nombre} — ${dA.dia} de ${meses[dA.mes-1]} de ${dA.anio}`,pW/2,y,{align:'center'});y+=6;
+    doc.text(`${dB.nombre} — ${dB.dia} de ${meses[dB.mes-1]} de ${dB.anio}`,pW/2,y,{align:'center'});y+=7;
+    if(dA.email){doc.setFontSize(7.8);doc.setFont('helvetica','normal');doc.setTextColor(120,120,120);doc.text(dA.email,pW/2,y,{align:'center'});y+=4;}
+    y+=6;
+
+    /* ===== PÁGINAS CRUZ COMPARATIVA ===== */
+    const paginaComparativa=async(gridId,nombreOverlay,narKey)=>{
+        doc.addPage();pie();y=30;
+        doc.setFontSize(22);doc.setFont('times','italic');doc.setTextColor(46,139,87);doc.text(nombreOverlay,pW/2,y,{align:'center'});y+=9;
+        doc.setDrawColor(46,139,87);doc.setLineWidth(0.3);doc.line(pW/2-14,y,pW/2+14,y);y+=7;
+        doc.setFontSize(9.5);doc.setFont('times','italic');doc.setTextColor(100,100,100);doc.text('Resonancias y tensiones del vinculo',pW/2,y,{align:'center'});y+=8;
+        try{const el=document.getElementById(gridId);const cv=await html2canvas(el,{scale:3.5,backgroundColor:'#FFFFFF',width:el.scrollWidth,height:el.scrollHeight});const ratio=cv.height/cv.width;const maxImgH=seg-y-14;let iw;if((maxImgH/ratio)<aU){iw=maxImgH/ratio;}else{iw=aU*0.82;}let ih=iw*ratio;if(ih>maxImgH){ih=maxImgH;iw=ih/ratio;}doc.addImage(cv.toDataURL('image/png'),'PNG',(pW-iw)/2,y,iw,ih);y+=ih+10;}catch(e){y+=8;}
+        if(nar[narKey]){salt(18);
+            doc.setFontSize(20);doc.setFont('times','italic');doc.setTextColor(46,139,87);doc.text(nombreOverlay,pW/2,y,{align:'center'});y+=9;
+            doc.setDrawColor(46,139,87);doc.setLineWidth(0.25);doc.line(pW/2-14,y,pW/2+14,y);y+=8;
+            const bloques=nar[narKey].split('\n\n').filter(p=>p.trim());
+            for(const bloque of bloques){const tl=lmp(bloque.replace(/\*\*(.*?)\*\*/g,'$1').trim());if(!tl)continue;
+                if(bloque.startsWith('**')&&bloque.endsWith('**')){par(tl,11.5,'times','bold',[30,30,30],mI,0,2);}
+                else{par(tl,10.5,'times','normal',[35,35,35],mI,0,2);}}
+        }else{salt(16);doc.setFontSize(10);doc.setFont('times','italic');doc.setTextColor(190,190,190);doc.text('Narrativa no generada.',mI,y);y+=14;}
+    };
+
+    await paginaComparativa('cruzGrid-AB',`${pA} / ${pB}`,'AB');
+    await paginaComparativa('cruzGrid-BA',`${pB} / ${pA}`,'BA');
+
+    /* ===== EL PLANO DEL VÍNCULO — CONCLUSIÓN ===== */
+    if(seg-y<95){doc.addPage();pie();y=38;}else{y+=18;}
+    doc.setDrawColor(46,139,87);doc.setLineWidth(0.35);doc.line(mI+8,y,pW-mD-8,y);y+=14;
+    doc.setFontSize(18);doc.setFont('times','italic');doc.setTextColor(46,139,87);doc.text('El Plano del Vinculo',pW/2,y,{align:'center'});y+=12;
+    doc.setDrawColor(215,215,215);doc.setLineWidth(0.2);doc.line(mI+25,y,pW-mD-25,y);y+=12;
+    const textoConclusion=generarConclusion(vincRaw,cA,cB,dA.nombre,dB.nombre,trecena(cA),trecena(cB),gA,gB);
+    const parrafosConclusion=textoConclusion.split('\n\n').filter(p=>p.trim());
+    for(const p of parrafosConclusion){const tl=lmp(p.trim());if(tl)par(tl,10.5,'times','normal',[35,35,35],mI,0,3);}
+    salt(28);y+=6;
+    doc.setDrawColor(200,200,200);doc.setLineWidth(0.5);doc.line(mI,y,pW-mD,y);y+=12;
+    const hoy=new Date();doc.setFontSize(10);doc.setFont('helvetica','normal');doc.setTextColor(100,100,100);
+    doc.text(`${hoy.getDate()} de ${meses[hoy.getMonth()]} de ${hoy.getFullYear()}`,mI,y);
+    if(firmaImg){const fw=85,fh=fw*(firmaImg.h/firmaImg.w);doc.addImage(firmaImg.d,'PNG',pW-mD-fw,y-10,fw,fh);}else{doc.setFontSize(12);doc.setFont('times','italic');doc.setTextColor(46,139,87);doc.text('Protocolo Cruz Maya',pW-mD,y,{align:'right'});}
+    doc.save(`Sincronia_${vinc}_${dA.nombre.replace(/\s/g,'_')}_${dB.nombre.replace(/\s/g,'_')}.pdf`);
+    btn.disabled=false;btn.textContent='DESCARGAR REPORTE PDF';
+
+    }catch(err){
+        alert('Error al generar PDF: '+err.message);
+        console.error(err);
+        const btn=document.getElementById('btn-pdf');
+        if(btn){btn.disabled=false;btn.textContent='DESCARGAR REPORTE PDF';}
+    }
+}
+window.addEventListener('DOMContentLoaded',iniciar);
+</script>
+</body>
+</html>

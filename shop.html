@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Boutique — Protocolo Cruz Maya</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@100;300;400&family=Space+Mono&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --black: #0A0A0A;
+            --white: #FFFFFF;
+            --grey-base: 232, 232, 232;
+            --accent: #2E8B57;
+            --font-serif: 'Playfair Display', serif;
+            --font-mono: 'Space Mono', monospace;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background-color: var(--white); color: var(--black); font-family: 'Inter', sans-serif; overflow-x: hidden; }
+
+        /* --- FONDO ANIMADO --- */
+        #bg-canvas {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -2; background: radial-gradient(circle at center, #ffffff 0%, #e0e0e0 100%);
+        }
+
+        /* --- NAVEGACIÓN --- */
+        nav.main-nav {
+            position: absolute; top: 40px; right: 50px; display: flex; gap: 35px; z-index: 100;
+        }
+        nav.main-nav a {
+            text-decoration: none; color: var(--black); font-family: var(--font-mono);
+            font-size: 0.65rem; letter-spacing: 2px; text-transform: uppercase; opacity: 0.6;
+        }
+
+        header { height: 25vh; display: flex; justify-content: center; align-items: center; }
+        .logo-nav { width: 160px; height: auto; cursor: pointer; }
+
+        .hero-shop { text-align: center; padding: 20px; border-bottom: 1px solid #eee; }
+        .hero-shop h1 { font-family: var(--font-serif); font-size: 2.5rem; font-weight: 400; margin-bottom: 15px; }
+        .hero-shop h1 i { color: var(--accent); font-style: italic; }
+        
+        /* --- TIRA GRIS DE TEXTO --- */
+        .tech-section {
+            position: relative; padding: 60px 40px; margin-bottom: 60px;
+            background: transparent;
+        }
+        .tech-section::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(var(--grey-base), 0.75); backdrop-filter: blur(8px);
+            z-index: -1;
+        }
+        .tech-text { max-width: 800px; margin: 0 auto; text-align: center; }
+        .tech-text p { font-family: var(--font-serif); font-size: 1.3rem; color: #333; line-height: 1.8; margin-bottom: 15px; }
+        .tech-text span { display: block; font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 3px; color: #666; margin-top: 15px; text-transform: uppercase; }
+
+        /* --- GRID SIMÉTRICO --- */
+        .shop-container { max-width: 1100px; margin: 0 auto 100px auto; padding: 0 40px; }
+        .categories-grid {
+            display: grid; grid-template-columns: repeat(2, 1fr); gap: 60px 40px;
+        }
+
+        .cat-card {
+            background: #fff; border: 1px solid #eee; padding: 0;
+            transition: all 0.3s ease; text-decoration: none; color: inherit; display: block;
+        }
+        .cat-card:hover { box-shadow: 0 15px 40px rgba(0,0,0,0.06); transform: translateY(-5px); border-color: var(--accent); }
+
+        .cat-img-box {
+            width: 100%; height: 280px; background: #f9f9f9; display: flex; align-items: center; justify-content: center; overflow: hidden;
+        }
+        .cat-img-box img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; opacity: 0.9; }
+        .cat-card:hover .cat-img-box img { transform: scale(1.05); opacity: 1; }
+
+        .cat-info { padding: 30px 20px; text-align: center; }
+        .cat-title { font-family: var(--font-serif); font-size: 1.6rem; margin-bottom: 10px; font-weight: 400; }
+        .cat-desc { font-size: 0.9rem; color: #666; line-height: 1.6; margin-bottom: 25px; }
+        
+        .btn-ver-coleccion {
+            display: inline-block; padding: 12px 0; width: 100%;
+            border-top: 1px solid #eee; color: var(--accent);
+            font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 2px;
+            transition: background 0.3s, color 0.3s;
+        }
+        .cat-card:hover .btn-ver-coleccion { background: var(--accent); color: white; border-color: var(--accent); }
+
+        /* FOOTER */
+        footer { background-color: var(--black); color: var(--white); padding: 60px 80px; display: flex; justify-content: space-between; align-items: center; }
+        .footer-brand { display: flex; flex-direction: column; align-items: center; }
+        .protocolo-f { font-family: var(--font-mono); font-size: 0.75rem; letter-spacing: 12.8px; text-transform: uppercase; opacity: 0.5; margin-right: -12.8px; width: 100%; text-align: center; }
+        .cruzmaya-f { font-family: var(--font-serif); font-size: 2.4rem; font-weight: 400; line-height: 1; }
+
+        @media (max-width: 850px) { .categories-grid { grid-template-columns: 1fr; gap: 40px; } .nav.main-nav { display: none; } }
+    </style>
+</head>
+<body>
+
+    <canvas id="bg-canvas"></canvas>
+
+    <nav class="main-nav">
+        <a href="index.html">Inicio</a>
+        <a href="aprender.html">Metodología</a>
+        <a href="shop.html">Shop</a>
+    </nav>
+
+    <header>
+        <img src="img/logo.png" alt="Logo" class="logo-nav" onclick="window.location.href='index.html'">
+    </header>
+
+    <div class="hero-shop">
+        <h1>Curaduría <i>Energética</i></h1>
+    </div>
+
+    <section class="tech-section">
+        <div class="tech-text">
+            <p>No vendemos objetos, entregamos extensiones de tu arquitectura interior. Cada herramienta ha sido seleccionada por su capacidad de resonancia con tu Nahual y su aporte a la bioneuroemoción.</p>
+            <span>LA MATERIA AL SERVICIO DEL ALMA</span>
+        </div>
+    </section>
+
+    <main class="shop-container">
+        <div class="categories-grid">
+            
+            <a href="shop-categoria.html?cat=Conocimiento" class="cat-card">
+                <div class="cat-img-box">
+                    <img src="img/conocimiento_es_luz.jpg" alt="Conocimiento">
+                </div>
+                <div class="cat-info">
+                    <h3 class="cat-title">Conocimiento</h3>
+                    <p class="cat-desc">Herramientas para el estudio y la comprensión de los ciclos cósmicos.</p>
+                    <div class="btn-ver-coleccion">VER COLECCIÓN</div>
+                </div>
+            </a>
+
+            <a href="shop-categoria.html?cat=Cuerpo" class="cat-card">
+                <div class="cat-img-box">
+                    <img src="img/cuerpo_y_espiritu.jpg" alt="Cuerpo">
+                </div>
+                <div class="cat-info">
+                    <h3 class="cat-title">Cuerpo</h3>
+                    <p class="cat-desc">Texturas y materiales que respetan la integridad de tu sistema biológico.</p>
+                    <div class="btn-ver-coleccion">VER COLECCIÓN</div>
+                </div>
+            </a>
+
+            <a href="shop-categoria.html?cat=Regalos" class="cat-card">
+                <div class="cat-img-box">
+                    <img src="img/regalos_para_el_alma.jpg" alt="Regalos">
+                </div>
+                <div class="cat-info">
+                    <h3 class="cat-title">Regalos</h3>
+                    <p class="cat-desc">Objetos de intención para honrar el camino de otros seres.</p>
+                    <div class="btn-ver-coleccion">VER COLECCIÓN</div>
+                </div>
+            </a>
+
+            <a href="shop-categoria.html?cat=Salud" class="cat-card">
+                <div class="cat-img-box">
+                    <img src="img/salud_y_proteccion.jpg" alt="Salud">
+                </div>
+                <div class="cat-info">
+                    <h3 class="cat-title">Salud y Protección</h3>
+                    <p class="cat-desc">Limpieza energética, aromaterapia y blindaje físico.</p>
+                    <div class="btn-ver-coleccion">VER COLECCIÓN</div>
+                </div>
+            </a>
+
+        </div>
+    </main>
+
+    <footer>
+        <div class="footer-brand">
+            <span class="protocolo-f">PROTOCOLO</span>
+            <span class="cruzmaya-f">Cruz Maya</span>
+        </div>
+        <div style="display: flex; gap: 30px;">
+            <a href="mailto:protocolo.cruzmaya@gmail.com" style="color:white; opacity:0.3; text-decoration:none; font-family:var(--font-mono); font-size:0.65rem;">CONTACTO</a>
+        </div>
+    </footer>
+
+    <script>
+        const canvas = document.getElementById('bg-canvas');
+        const ctx = canvas.getContext('2d');
+        let points = []; let mouse = { x: 0, y: 0 };
+        function init() {
+            canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+            points = [];
+            for(let i=0; i<65; i++) points.push({ x: Math.random()*canvas.width, y: Math.random()*canvas.height, vx: (Math.random()-0.5)*0.5, vy: (Math.random()-0.5)*0.5 });
+        }
+        window.addEventListener('mousemove', (e) => { mouse.x = (e.clientX - canvas.width/2) * 0.05; mouse.y = (e.clientY - canvas.height/2) * 0.05; });
+        function animate() {
+            ctx.clearRect(0,0,canvas.width, canvas.height);
+            ctx.strokeStyle = "rgba(46, 139, 87, 0.3)"; ctx.fillStyle = "rgba(0,0,0,0.12)";
+            points.forEach((p, i) => {
+                p.x += p.vx; p.y += p.vy;
+                if(p.x<0 || p.x>canvas.width) p.vx*=-1; if(p.y<0 || p.y>canvas.height) p.vy*=-1;
+                let tx = p.x + mouse.x; let ty = p.y + mouse.y;
+                ctx.beginPath(); ctx.arc(tx, ty, 1.8, 0, Math.PI*2); ctx.fill();
+                for(let j=i+1; j<points.length; j++) {
+                    let p2 = points[j];
+                    let dist = Math.hypot(p.x-p2.x, p.y-p2.y);
+                    if(dist < 210) { ctx.beginPath(); ctx.moveTo(tx, ty); ctx.lineTo(p2.x + mouse.x, p2.y + mouse.y); ctx.stroke(); }
+                }
+            });
+            requestAnimationFrame(animate);
+        }
+        init(); animate(); window.addEventListener('resize', init);
+    </script>
+</body>
+</html>

@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configuración de Matriz — Protocolo Cruz Maya</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;1,400&family=Inter:wght@200;400&family=Space+Mono&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --black: #0A0A0A;
+            --white: #FFFFFF;
+            --grey-zone: #EAEAEA;
+            --accent: #2E8B57;
+            --font-serif: 'Playfair Display', serif;
+            --font-mono: 'Space Mono', monospace;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            background-color: var(--white); 
+            color: var(--black); 
+            font-family: 'Inter', sans-serif; 
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* --- FONDO DINÁMICO --- */
+        #bg-canvas {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -2;
+            background: radial-gradient(circle at center, #ffffff 0%, #e5e5e5 100%);
+        }
+
+        /* --- NAVEGACIÓN --- */
+        nav.main-nav {
+            position: absolute; top: 40px; right: 50px;
+            display: flex; gap: 35px; z-index: 100;
+        }
+        nav.main-nav a {
+            text-decoration: none; color: var(--black); font-family: var(--font-mono);
+            font-size: 0.65rem; letter-spacing: 2px; text-transform: uppercase; opacity: 0.6;
+        }
+
+        /* --- HEADER --- */
+        header { padding: 60px 0; display: flex; justify-content: center; align-items: center; }
+        .logo-nav { width: 160px; height: auto; cursor: pointer; }
+
+        /* --- TIRA GRIS --- */
+        .title-strip {
+            background-color: var(--grey-zone); width: 100vw;
+            padding: 30px 0; margin-bottom: 60px; text-align: center;
+            border-top: 1px solid rgba(0,0,0,0.05); border-bottom: 1px solid rgba(0,0,0,0.05);
+            position: relative; z-index: 1;
+        }
+        .title-strip h2 {
+            font-family: var(--font-serif); font-size: 2.4rem; font-weight: 400; margin-bottom: 10px;
+        }
+        .title-strip h2 i { color: var(--accent); }
+        .title-strip p {
+            font-family: var(--font-mono); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 3px; opacity: 0.5;
+        }
+
+        /* --- FORMULARIO --- */
+        .form-wrapper {
+            flex: 1; display: flex; justify-content: center; align-items: center; padding-bottom: 80px;
+        }
+        .config-card {
+            background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(10px);
+            border: 1px solid rgba(0,0,0,0.1); width: 100%; max-width: 500px;
+            padding: 50px; box-shadow: 0 20px 40px rgba(0,0,0,0.03); text-align: center;
+        }
+
+        .decor-img-small {
+            width: 100px; height: auto; margin-bottom: 30px; opacity: 0.85; filter: grayscale(100%);
+        }
+
+        .form-group { margin-bottom: 25px; text-align: left; }
+        .form-group label {
+            display: block; font-family: var(--font-mono); font-size: 0.65rem; letter-spacing: 2px;
+            text-transform: uppercase; margin-bottom: 10px; opacity: 0.7;
+        }
+
+        input {
+            width: 100%; background: transparent; border: none; border-bottom: 1px solid rgba(0,0,0,0.15);
+            padding: 10px 0; font-family: 'Inter', sans-serif; font-size: 1rem; transition: 0.3s;
+        }
+        input:focus { outline: none; border-bottom: 1px solid var(--accent); }
+        /* Ajuste para el código */
+        input[name="codigo"] { text-transform: uppercase; font-family: var(--font-mono); letter-spacing: 2px; font-weight: bold; }
+
+        .date-grid { display: grid; grid-template-columns: 1fr 1fr 1.5fr; gap: 15px; }
+
+        .btn-generate {
+            width: 100%; background: var(--black); color: var(--white); border: none; padding: 20px;
+            margin-top: 15px; font-family: var(--font-mono); font-size: 0.75rem; letter-spacing: 4px;
+            text-transform: uppercase; cursor: pointer; transition: 0.4s;
+        }
+        .btn-generate:hover { background: var(--accent); letter-spacing: 6px; }
+
+        /* --- FOOTER --- */
+        footer {
+            background-color: var(--black); color: var(--white); padding: 40px 80px;
+            display: flex; justify-content: space-between; align-items: center; margin-top: auto;
+        }
+        .footer-brand { display: flex; flex-direction: column; align-items: center; }
+        .protocolo-f { font-family: var(--font-mono); font-size: 0.6rem; letter-spacing: 10px; text-transform: uppercase; opacity: 0.5; }
+        .cruzmaya-f { font-family: var(--font-serif); font-size: 2rem; font-weight: 400; }
+        
+        @media (max-width: 850px) {
+            footer { flex-direction: column; gap: 20px; padding: 30px; }
+            header { padding: 30px 0; } .date-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="bg-canvas"></canvas>
+
+    <nav class="main-nav">
+        <a href="index.html">Inicio</a>
+        <a href="about.html">Nosotros</a>
+        <a href="aprender.html">Aprende</a>
+        <a href="contacto.html">Contacto</a>
+    </nav>
+
+    <header>
+        <img src="img/logo.png" alt="Logo" class="logo-nav" onclick="window.location.href='index.html'">
+    </header>
+
+    <section class="title-strip">
+        <h2>Cruz <i>Esencial</i></h2>
+        <p>Configuración de Matriz Arquetípica</p>
+    </section>
+
+    <main class="form-wrapper">
+        <div class="config-card">
+            <img src="img/basica.jpg" alt="Icono" class="decor-img-small">
+            <form action="resultado-cruz.html" method="GET">
+                <div class="form-group">
+                    <label>Identidad</label>
+                    <input type="text" name="nombre" placeholder="Nombre completo" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Coordenada Temporal</label>
+                    <div class="date-grid">
+                        <input type="number" name="dia" placeholder="DD" required>
+                        <input type="number" name="mes" placeholder="MM" required>
+                        <input type="number" name="anio" placeholder="AAAA" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Código de Acceso (Instagram)</label>
+                    <input type="text" name="codigo" placeholder="Ej: PXM-8X29" required>
+                    <p style="font-size: 0.7rem; color: #999; margin-top: 5px; font-style: italic;">¿No tienes código? <a href="https://www.instagram.com/tu_cuenta_aqui" target="_blank" style="color: var(--accent); text-decoration: none;">Genera uno aquí</a>.</p>
+                </div>
+
+                <div class="form-group">
+                    <label>Correo de Envío (PDF)</label>
+                    <input type="email" name="email" placeholder="tu@email.com" required>
+                </div>
+
+                <button type="button" class="btn-generate" onclick="validarYRedirigir()">INICIAR DECODIFICACIÓN_</button>
+            </form>
+        </div>
+    </main>
+
+    <footer>
+        <div class="footer-brand">
+            <span class="protocolo-f">PROTOCOLO</span>
+            <span class="cruzmaya-f">Cruz Maya</span>
+        </div>
+        <div style="font-family: var(--font-mono); font-size: 0.6rem; opacity: 0.3;">&copy; 2026</div>
+    </footer>
+
+    <script>
+        // Script estándar de fondo
+        const canvas = document.getElementById('bg-canvas');
+        const ctx = canvas.getContext('2d');
+        let points = [];
+        function init() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            points = [];
+            for(let i=0; i<60; i++) {
+                points.push({
+                    x: Math.random()*canvas.width,
+                    y: Math.random()*canvas.height,
+                    vx: (Math.random()-0.5)*0.3, vy: (Math.random()-0.5)*0.3
+                });
+            }
+        }
+        function animate() {
+            ctx.clearRect(0,0,canvas.width, canvas.height);
+            ctx.strokeStyle = "rgba(46, 139, 87, 0.2)";
+            ctx.fillStyle = "rgba(0,0,0,0.1)";
+            points.forEach((p, i) => {
+                p.x += p.vx; p.y += p.vy;
+                if(p.x<0 || p.x>canvas.width) p.vx*=-1;
+                if(p.y<0 || p.y>canvas.height) p.vy*=-1;
+                ctx.beginPath(); ctx.arc(p.x, p.y, 1.2, 0, Math.PI*2); ctx.fill();
+                for(let j=i+1; j<points.length; j++) {
+                    let p2 = points[j];
+                    let dist = Math.hypot(p.x-p2.x, p.y-p2.y);
+                    if(dist < 180) {
+                        ctx.beginPath(); ctx.moveTo(p.x, p.y);
+                        ctx.lineTo(p2.x, p2.y); ctx.stroke();
+                    }
+                }
+            });
+            requestAnimationFrame(animate);
+        }
+        init(); animate();
+        window.addEventListener('resize', init);
+
+        // ============================================================
+        // VALIDACIÓN DE CÓDIGO DE ACCESO
+        // ============================================================
+        // CÓDIGOS DE PRUEBA — ELIMINAR ANTES DE PUBLICAR EN INTERNET
+        const CODIGOS_PRUEBA = ["TEST-0000", "PRUEBA-01", "ADMIN-99"];
+        // ============================================================
+
+        function validarYRedirigir() {
+            const nombre = document.querySelector('[name="nombre"]').value.trim();
+            const dia    = document.querySelector('[name="dia"]').value.trim();
+            const mes    = document.querySelector('[name="mes"]').value.trim();
+            const anio   = document.querySelector('[name="anio"]').value.trim();
+            const codigo = document.querySelector('[name="codigo"]').value.trim().toUpperCase();
+            const email  = document.querySelector('[name="email"]').value.trim();
+
+            // Validar campos vacíos
+            if (!nombre || !dia || !mes || !anio || !codigo || !email) {
+                alert("Por favor completa todos los campos.");
+                return;
+            }
+
+            // Validar fecha básica
+            const diaNum = parseInt(dia), mesNum = parseInt(mes), anioNum = parseInt(anio);
+            if (diaNum < 1 || diaNum > 31 || mesNum < 1 || mesNum > 12 || anioNum < 1900 || anioNum > 2025) {
+                alert("Por favor verifica que la fecha de nacimiento sea correcta.");
+                return;
+            }
+
+            // Validar código — acepta códigos de prueba siempre
+            // Los códigos reales de Instagram tienen formato: 3 letras + guión + 4 caracteres
+            const esCodigoPrueba = CODIGOS_PRUEBA.includes(codigo);
+            const formatoValido  = /^[A-Z]{3}-[A-Z0-9]{4}$/.test(codigo);
+
+            if (!esCodigoPrueba && !formatoValido) {
+                alert("Código de acceso inválido.\n\nVerifica que lo hayas copiado correctamente del mensaje de Instagram.\n¿No tienes código? Sigue nuestra cuenta y comenta \"CRUZ\" en cualquier publicación.");
+                return;
+            }
+
+            // Todo OK — redirigir a resultado
+            const params = new URLSearchParams({
+                nombre, dia, mes, anio, email, codigo
+            });
+            window.location.href = "resultado-cruz.html?" + params.toString();
+        }
+    </script>
+</body>
+</html>

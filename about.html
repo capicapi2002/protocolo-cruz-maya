@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nosotros — Protocolo Cruz Maya</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@100;300;400&family=Space+Mono&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --black: #0A0A0A;
+            --white: #FFFFFF;
+            --grey-base: 232, 232, 232;
+            --accent: #2E8B57;
+            --font-serif: 'Playfair Display', serif;
+            --font-mono: 'Space Mono', monospace;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background-color: var(--white); color: var(--black); font-family: 'Inter', sans-serif; overflow-x: hidden; }
+
+        /* --- FONDO DINÁMICO --- */
+        #bg-canvas {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -2;
+            background: radial-gradient(circle at center, #ffffff 0%, #e0e0e0 100%);
+        }
+
+        /* --- NAVEGACIÓN --- */
+        nav.main-nav {
+            position: absolute;
+            top: 40px; right: 50px;
+            display: flex; gap: 35px;
+            z-index: 100;
+        }
+        nav.main-nav a {
+            text-decoration: none;
+            color: var(--black);
+            font-family: var(--font-mono);
+            font-size: 0.65rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            opacity: 0.6;
+        }
+
+        /* --- CABECERA --- */
+        header {
+            height: 25vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .logo-small { width: 160px; height: auto; cursor: pointer; }
+
+        /* --- CUERPO EDITORIAL --- */
+        .content-wrapper {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 60px 20px 120px 20px;
+            position: relative;
+        }
+
+        .hero-text {
+            text-align: center;
+            margin-bottom: 80px;
+        }
+        .hero-text h1 {
+            font-family: var(--font-serif);
+            font-size: 3.5rem;
+            font-weight: 400;
+            margin-bottom: 20px;
+        }
+        .hero-text h1 i { color: var(--accent); font-style: italic; }
+
+        .image-container {
+            width: 100%;
+            height: 400px;
+            margin-bottom: 80px;
+            position: relative;
+            background-color: rgba(var(--grey-base), 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+        .image-container img {
+            width: 80%;
+            height: 80%;
+            object-fit: contain;
+            mix-blend-mode: multiply;
+            opacity: 0.8;
+        }
+
+        .manifesto {
+            column-count: 2;
+            column-gap: 60px;
+            text-align: justify;
+        }
+
+        .manifesto p {
+            font-size: 1rem;
+            line-height: 1.8;
+            margin-bottom: 30px;
+            font-weight: 300;
+            color: #222;
+        }
+
+        .manifesto p b { font-weight: 600; color: var(--black); }
+
+        .highlight-box {
+            grid-column: span 2;
+            background: rgba(var(--grey-base), 0.8);
+            backdrop-filter: blur(10px);
+            padding: 50px;
+            margin: 40px 0;
+            border-left: 3px solid var(--accent);
+            column-span: all; /* Rompe las columnas */
+        }
+
+        .highlight-box h2 {
+            font-family: var(--font-serif);
+            font-size: 2rem;
+            margin-bottom: 20px;
+            font-weight: 400;
+        }
+
+        /* --- FOOTER SIMÉTRICO --- */
+        footer {
+            background-color: var(--black);
+            color: var(--white);
+            padding: 60px 80px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .footer-brand {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .protocolo-f {
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            letter-spacing: 12.8px;
+            text-transform: uppercase;
+            opacity: 0.5;
+            margin-right: -12.8px;
+            width: 100%;
+            text-align: center;
+        }
+        .cruzmaya-f {
+            font-family: var(--font-serif);
+            font-size: 2.4rem; 
+            font-weight: 400; 
+            line-height: 1;
+        }
+
+        @media (max-width: 800px) {
+            .manifesto { column-count: 1; }
+            .hero-text h1 { font-size: 2.5rem; }
+            footer { flex-direction: column; gap: 40px; }
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="bg-canvas"></canvas>
+
+    <nav class="main-nav">
+        <a href="index.html">Inicio</a>
+        <a href="shop.html">Boutique</a>
+        <a href="contacto.html">Contacto</a>
+    </nav>
+
+    <header>
+        <img src="img/logo.png" alt="Protocolo Cruz Maya" class="logo-small" onclick="window.location.href='index.html'">
+    </header>
+
+    <main class="content-wrapper">
+        <div class="hero-text">
+            <h1>Arquitectura de la <i>Consciencia</i></h1>
+        </div>
+
+        <div class="image-container">
+            <img src="img/cerebro electornico.png" alt="Sinergia Técnica">
+        </div>
+
+        <section class="manifesto">
+            <p>Protocolo Cruz Maya nace en la intersección donde la <b>geometría ancestral</b> y la <b>ciencia moderna</b> convergen. Nuestro estudio es el resultado de un camino riguroso por conciliar la matemática sagrada de la cultura maya con la precisión biológica de la biodescodificación.</p>
+            
+            <p>Entendemos la existencia no como un conjunto de azares, sino como una estructura técnica. Las emociones no son solo sentimientos; son información codificada que influye en nuestra realidad física y en la repetición de patrones sistémicos.</p>
+
+            <div class="highlight-box">
+                <h2>Nuestra Misión: Desbloqueo Estructural</h2>
+                <p>Fusionamos el análisis del Nahual con el estudio de las improntas emocionales para brindar una herramienta <b>reveladora y sanadora</b>. Nuestro objetivo es abrir caminos mediante el entendimiento de la propia arquitectura vital, transformando la incertidumbre en un mapa de navegación claro y accionable.</p>
+            </div>
+
+            <p>Creemos que el conocimiento de alto valor no debe ser un privilegio de élite. Mientras otros proponen asesorías de costo prohibitivo, en Protocolo Cruz Maya hemos decidido apostar por la <b>democratización de la sabiduría</b>.</p>
+
+            <p>Mantenemos una estructura de acceso simplificada porque nuestra prioridad es el impacto: facilitar una herramienta técnica que ayude a sanar, desbloquear y rediseñar la realidad de cada individuo que se atreva a mirar su propio diseño.</p>
+            
+            <p>Bienvenido al laboratorio donde lo ancestral se vuelve <b>matemáticamente útil</b>.</p>
+        </section>
+    </main>
+
+    <footer>
+        <div class="footer-brand">
+            <span class="protocolo-f">PROTOCOLO</span>
+            <span class="cruzmaya-f">Cruz Maya</span>
+        </div>
+        <div style="display: flex; gap: 30px;">
+            <a href="index.html" style="color:white; opacity:0.3; text-decoration:none; font-family:var(--font-mono); font-size:0.65rem;">VOLVER AL INICIO</a>
+            <a href="contacto.html" style="color:white; opacity:0.3; text-decoration:none; font-family:var(--font-mono); font-size:0.65rem;">CONTACTO</a>
+        </div>
+    </footer>
+
+    <script>
+        const canvas = document.getElementById('bg-canvas');
+        const ctx = canvas.getContext('2d');
+        let points = [];
+        let mouse = { x: 0, y: 0 };
+
+        function init() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            points = [];
+            for(let i=0; i<65; i++) {
+                points.push({
+                    x: Math.random()*canvas.width,
+                    y: Math.random()*canvas.height,
+                    vx: (Math.random()-0.5)*0.5,
+                    vy: (Math.random()-0.5)*0.5
+                });
+            }
+        }
+
+        window.addEventListener('mousemove', (e) => {
+            mouse.x = (e.clientX - canvas.width/2) * 0.05;
+            mouse.y = (e.clientY - canvas.height/2) * 0.05;
+        });
+
+        function animate() {
+            ctx.clearRect(0,0,canvas.width, canvas.height);
+            ctx.strokeStyle = "rgba(46, 139, 87, 0.3)"; 
+            ctx.fillStyle = "rgba(0,0,0,0.12)";
+
+            points.forEach((p, i) => {
+                p.x += p.vx; p.y += p.vy;
+                if(p.x<0 || p.x>canvas.width) p.vx*=-1;
+                if(p.y<0 || p.y>canvas.height) p.vy*=-1;
+
+                let tx = p.x + mouse.x;
+                let ty = p.y + mouse.y;
+
+                ctx.beginPath();
+                ctx.arc(tx, ty, 1.8, 0, Math.PI*2);
+                ctx.fill();
+
+                for(let j=i+1; j<points.length; j++) {
+                    let p2 = points[j];
+                    let dist = Math.hypot(p.x-p2.x, p.y-p2.y);
+                    if(dist < 210) {
+                        ctx.beginPath();
+                        ctx.moveTo(tx, ty);
+                        ctx.lineTo(p2.x + mouse.x, p2.y + mouse.y);
+                        ctx.stroke();
+                    }
+                }
+            });
+            requestAnimationFrame(animate);
+        }
+
+        init(); animate();
+        window.addEventListener('resize', init);
+    </script>
+</body>
+</html>
