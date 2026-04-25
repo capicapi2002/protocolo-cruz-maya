@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Auditoría Individual — Protocolo Cruz Maya</title>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@200;400&family=Space+Mono&display=swap" rel="stylesheet">
+    <script src="precios.js"></script>
     <style>
         :root {
             --black: #0A0A0A; --white: #FFFFFF; --grey-zone: #EAEAEA; --accent: #2E8B57;
@@ -91,7 +92,14 @@
         @media (max-width: 850px) { footer { flex-direction: column; gap: 20px; padding: 30px; } header { padding: 30px 0; } }
     </style>
 </head>
-<body>
+<body oncontextmenu="return false">
+<script>
+document.onkeydown = function(e) {
+    if (e.keyCode == 123 || (e.ctrlKey && e.shiftKey && e.keyCode == 73) || (e.ctrlKey && e.keyCode == 85)) {
+        return false;
+    }
+};
+</script>
 
     <canvas id="bg-canvas"></canvas>
 
@@ -144,7 +152,7 @@
                 <!-- MODO PRUEBA: botón saltea pago. REACTIVAR PAGO antes de publicar -->
                 <button type="button" class="btn-generate" onclick="irAResultado()">INICIAR ANÁLISIS (MODO PRUEBA)</button>
                 <!-- PRODUCCIÓN: descomentar la línea siguiente y borrar el botón de arriba
-                <button type="button" class="btn-generate" onclick="irAPago()">PROCESAR PAGO Y DECODIFICAR</button>
+                <button type="button" class="btn-generate" onclick="irAPago()">PROCESAR PAGO Y DECODIFICAR — $<span id="precio-individual">15</span></button>
                 -->
             </form>
         </div>
@@ -158,6 +166,12 @@
     </footer>
 
     <script>
+        // Actualizar precio en botones si existen
+        if (typeof precios !== 'undefined') {
+            const spanPrecio = document.getElementById('precio-individual');
+            if (spanPrecio) spanPrecio.textContent = precios.individual;
+        }
+
         const canvas = document.getElementById('bg-canvas'); const ctx = canvas.getContext('2d'); let points = [];
         function init() {
             canvas.width = window.innerWidth; canvas.height = window.innerHeight; points = [];
@@ -180,18 +194,16 @@
 
         function irAResultado() {
             const nombre = document.querySelector('[name="nombre"]').value.trim();
-            const fecha  = document.querySelector('[name="fecha"]').value; // AAAA-MM-DD
+            const fecha  = document.querySelector('[name="fecha"]').value;
             const tipo   = document.querySelector('[name="tipo_cruz"]').value;
             const email  = document.querySelector('[name="email"]').value.trim();
 
             if (!nombre || !fecha || !tipo || !email) {
                 alert("Por favor completa todos los campos."); return;
             }
-            // Separar fecha en dia/mes/anio para resultado-cruz.html
             const partes = fecha.split('-');
             const anio = partes[0], mes = partes[1], dia = partes[2];
 
-            // CORREGIDO: Se agregó 'modo: pago' y se cambió 'tipo_cruz' por 'tipo'
             const params = new URLSearchParams({ 
                 modo: 'pago', 
                 nombre, 
@@ -202,10 +214,6 @@
                 tipo: tipo 
             });
             window.location.href = "resultado-cruz.html?" + params.toString();
-        }
-
-        function irAPago() {
-            document.getElementById('form-individual').submit();
         }
     </script>
 </body>

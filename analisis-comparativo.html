@@ -5,12 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sincronía de Energías — Protocolo Cruz Maya</title>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@200;400&family=Space+Mono&display=swap" rel="stylesheet">
+    <script src="precios.js"></script>
     <style>
         :root {
             --black: #0A0A0A;
             --white: #FFFFFF;
             --grey-zone: #EAEAEA;
-            --accent: #2E8B57; /* ERROR CORREGIDO */
+            --accent: #2E8B57;
             --font-serif: 'Playfair Display', serif;
             --font-mono: 'Space Mono', monospace;
             --font-sans: 'Inter', sans-serif;
@@ -18,7 +19,7 @@
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { 
-            background-color: var(--white); color: var(--black); font-family: var(--font-sans); /* ERROR CORREGIDO */
+            background-color: var(--white); color: var(--black); font-family: var(--font-sans); 
             overflow-x: hidden; display: flex; flex-direction: column; min-height: 100vh;
         }
 
@@ -116,9 +117,16 @@
         }
     </style>
 </head>
-<body>
+<body oncontextmenu="return false">
+<script>
+document.onkeydown = function(e) {
+    if (e.keyCode == 123 || (e.ctrlKey && e.shiftKey && e.keyCode == 73) || (e.ctrlKey && e.keyCode == 85)) {
+        return false;
+    }
+};
+</script>
 
-    <canvas id="bg-canvas"></canvas> <!-- ID CORREGIDA -->
+    <canvas id="bg-canvas"></canvas>
 
     <nav class="main-nav">
         <a href="index.html">Inicio</a>
@@ -174,7 +182,7 @@
                 <!-- MODO PRUEBA: botón saltea pago. REACTIVAR PAGO antes de publicar -->
                 <button type="button" class="btn-generate" onclick="irAResultadoComparativo()">INICIAR SINCRONÍA (MODO PRUEBA)_</button>
                 <!-- PRODUCCIÓN: descomentar y borrar botón de arriba
-                <button type="button" class="btn-generate" onclick="irAPago()">PROCESAR PAGO Y DECODIFICAR_</button>
+                <button type="button" class="btn-generate" onclick="irAPago()">PROCESAR PAGO Y DECODIFICAR — $<span id="precio-comparativa">18</span>_</button>
                 -->
             </form>
         </div>
@@ -193,6 +201,12 @@
     </footer>
 
     <script>
+        // Actualizar precio en botón si existe
+        if (typeof precios !== 'undefined') {
+            const spanPrecio = document.getElementById('precio-comparativa');
+            if (spanPrecio) spanPrecio.textContent = precios.comparativa;
+        }
+
         const canvas = document.getElementById('bg-canvas'); const ctx = canvas.getContext('2d'); let points = [];
         function init() {
             canvas.width = window.innerWidth; canvas.height = window.innerHeight; points = [];
@@ -224,7 +238,6 @@
             if (!nombreA || !fechaA || !nombreB || !fechaB || !tipo || !email) {
                 alert("Por favor completa todos los campos."); return;
             }
-            // Separar fechas en dia/mes/anio
             const pA = fechaA.split('-');
             const pB = fechaB.split('-');
 
@@ -233,13 +246,7 @@
                 nombreB, diaB: pB[2], mesB: pB[1], anioB: pB[0],
                 tipo_comparativa: tipo, email
             });
-            // Por ahora va a resultado-cruz.html con la persona A como base
-            // Cuando tengas resultado-comparativo.html, cambiar aquí
             window.location.href = "resultado-comparativo.html?" + params.toString();
-        }
-
-        function irAPago() {
-            document.getElementById('form-comparativo').submit();
         }
     </script>
 </body>

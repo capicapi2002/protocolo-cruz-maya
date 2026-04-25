@@ -8,15 +8,22 @@
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #0A0A0A; color: #EAEAEA; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 20px; }
         .simulador-box { background: #fff; padding: 60px; max-width: 550px; text-align: center; border-radius: 10px; box-shadow: 0 20px 50px rgba(0,0,0,0.1); }
-        h1 { font-family: 'Space Mono', monospace; font-size: 1.2rem; letter-spacing: 3px; margin-bottom: 20px; text-transform: uppercase; }
+        h1 { font-family: 'Space Mono', monospace; font-size: 1.2rem; letter-spacing: 3px; margin-bottom: 20px; text-transform: uppercase; color: #0A0A0A; }
         p { font-size: 1rem; line-height: 1.8; color: #444; margin-bottom: 30px; }
         .btn-falso { background: #2E8B57; color: white; border: none; padding: 18px 50px; font-family: 'Space Mono', monospace; font-size: 0.8rem; letter-spacing: 2px; text-transform: uppercase; cursor: pointer; text-decoration: none; transition: all 0.3s; }
         .btn-falso:hover { background: #1a5c38; transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,0,0,0.2); }
     </style>
 </head>
-<body>
-    <div class="simulador">
-        <h1>Procesando矩阵...</h1>
+<body oncontextmenu="return false">
+<script>
+document.onkeydown = function(e) {
+    if (e.keyCode == 123 || (e.ctrlKey && e.shiftKey && e.keyCode == 73) || (e.ctrlKey && e.keyCode == 85)) {
+        return false;
+    }
+};
+</script>
+    <div class="simulador-box">
+        <h1>Procesando...</h1>
         <p>Estamos decodificando las matrices para mostrarte el informe completo. Por favor, no cierres esta ventana ni recargues la página.</p>
         <p style="font-style: italic; font-size: 0.9rem; color: #666;">(Prueba de escritorio. Cuando conectemos los pagos reales, este paso será invisible para el cliente y pasará directo a su informe).</p>
         <button class="btn-falso" onclick="simularRedireccion()">VER INFORME DE PRUEBA</button>
@@ -24,14 +31,12 @@
 
     <script>
         function simularRedireccion() {
-            // Tomamos datos de prueba ficticios (Juan Pérez y María García)
             const params = new URLSearchParams({
                 nombre: "Juan Pérez",
                 fechaA: "1985-05-12",
                 fechaB: "1988-11-03",
                 email: "prueba@correo.com"
             });
-            // Redirigimos al resultado individual modificando la URL
             window.location.href = `resultado-cruz.html?nombre=${params.get('nombre')}&fecha=${params.get('fechaA')}&fechaB=${params.get('fechaB')}&email=${params.get('email')}`;
         }
     </script>

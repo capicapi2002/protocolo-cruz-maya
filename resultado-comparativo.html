@@ -7,6 +7,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@200;400&family=Space+Mono&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="precios.js"></script>
     <style>
         :root { --black: #0A0A0A; --white: #FFFFFF; --grey-zone: #EAEAEA; --accent: #2E8B57; --azul: #1a5fa8; --font-serif: 'Playfair Display', serif; --font-mono: 'Space Mono', monospace; --font-sans: 'Inter', sans-serif; }
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -74,7 +75,14 @@
         footer { padding:48px; text-align:center; font-family:var(--font-mono); font-size:0.56rem; opacity:0.32; border-top:1px solid #eee; }
     </style>
 </head>
-<body>
+<body oncontextmenu="return false">
+<script>
+document.onkeydown = function(e) {
+    if (e.keyCode == 123 || (e.ctrlKey && e.shiftKey && e.keyCode == 73) || (e.ctrlKey && e.keyCode == 85)) {
+        return false;
+    }
+};
+</script>
 <header><img src="img/logo.png" class="logo-header" onclick="window.location.href='index.html'"></header>
 <div class="hero">
     <div class="hero-label">Protocolo Cruz Maya · Análisis Comparativo</div>
@@ -115,18 +123,9 @@
 
 <script src="narrativas/textos.js"></script>
 <script>
-/* ================================================================
-   TRES API KEYS — ROTACIÓN AUTOMÁTICA
-   Carga aquí las tres claves de Google AI Studio
-   ================================================================ */
-const GEMINI_KEYS = [
-    "AIzaSyBtD4zR253GrQedtV45co3Sz5z1CJRwDKc",
-    "AIzaSyCwKlmgratuGeVbvstA85XFsVgGtzaYSt4",
-    "AIzaSyAAIeY2iFEvoMK8xom4tozSJNhu5ujtaRY"
-];
-let _keyIdx = 0;
-function getKey(){ return GEMINI_KEYS[_keyIdx++ % GEMINI_KEYS.length]; }
-
+// ============================================================
+// PROXY: sin API keys visibles. Llamada a /api/generar (tipo comparativo)
+// ============================================================
 let tipoVinculo = new URLSearchParams(window.location.search).get('tipo_comparativa') || 'pareja';
 if (tipoVinculo === 'salud') tipoVinculo = 'esencia';
 if (tipoVinculo === 'linaje') tipoVinculo = 'familia';
@@ -138,7 +137,28 @@ const nombresPos = ["Comunicación","Creatividad","Futuro","Concepción","Salud"
 const nawalesConAp=["Imox","Iq'","Aq'ab'al","K'at","Kan","Kame","Kej","Q'anil","Toj","Tz'i'","B'atz'","E'","Aj","I'x","Tz'ikin","Ajmaq","N'oj","Tijax","Kawoq","Ajpu'"];
 const nawalesSinAp=["Imox","IQ","AKBAL","KAT","kan","Kame","Kej","Qanil","Toj","Tzi","Batz","E","Aj","Ix","Tzikin","Ajmaq","Noj","Tijax","Kawoq","Ajpu"];
 const conv={}; nawalesConAp.forEach((n,i)=>conv[n]=nawalesSinAp[i]);
-const cruces={"Imox":["N'oj","Tz'ikin","Toj","Aq'ab'al","Aj","Kej","Imox","Tz'ikin","Toj","Kawoq","Aj","Kej","Kan"],"Iq'":["Tijax","Ajmaq","Tz'i'","Kat","I'x","Qanil","Iq'","Ajmaq","Tz'i'","Ajpu","I'x","Qanil","Kame"],"Aq'ab'al":["Kawoq","N'oj","B'atz'","Kan","Tz'ikin","Toj","Aq'ab'al","N'oj","B'atz'","Imox","Tz'ikin","Toj","Kej"],"K'at":["Ajpu'","Tijax","E'","Kame","Ajmaq","Tz'i'","K'at","Tijax","E'","Iq'","Ajmaq","Tz'i'","Qanil"],"Kan":["Imox","Kawoq","Aj","Kej","N'oj","B'atz'","Kan","Kawoq","Aj","Aq'ab'al","N'oj","B'atz'","Toj"],"Kame":["Iq'","Ajpu'","I'x","Qanil","Tijax","E'","Kame","Ajpu'","I'x","Kat","Tijax","E'","Tz'i'"],"Kej":["Aq'ab'al","Imox","Tz'ikin","Toj","Kawoq","Aj","Kej","Imox","Tz'ikin","Kan","Kawoq","Aj","B'atz'"],"Q'anil":["Kat","Iq'","Ajmaq","Tz'i'","Ajpu'","I'x","Q'anil","Iq'","Ajmaq","Kame","Ajpu'","I'x","E'"],"Toj":["Kan","Aq'ab'al","N'oj","B'atz'","Imox","Tz'ikin","Toj","Aq'ab'al","N'oj","Kej","Imox","Tz'ikin","Aj"],"Tz'i'":["Kame","Kat","Tijax","E'","Iq'","Ajmaq","Tz'i'","Kat","Tijax","Qanil","Iq'","Ajmaq","I'x"],"B'atz'":["Kej","Kan","Kawoq","Aj","Aq'ab'al","N'oj","B'atz'","Kan","Kawoq","Toj","Aq'ab'al","N'oj","Tz'ikin"],"E'":["Qanil","Kame","Ajpu'","I'x","Kat","Tijax","E'","Kame","Ajpu'","Tz'i'","Kat","Tijax","Ajmaq"],"Aj":["Toj","Kej","Imox","Tz'ikin","Kan","Kawoq","Aj","Kej","Imox","B'atz'","Kan","Kawoq","N'oj"],"I'x":["Tz'i'","Qanil","Iq'","Ajmaq","Kame","Ajpu'","I'x","Qanil","Iq'","E'","Kame","Ajpu'","Tijax"],"Tz'ikin":["B'atz'","Toj","Aq'ab'al","N'oj","Kej","Imox","Tz'ikin","Toj","Aq'ab'al","Aj","Kej","Imox","Kawoq"],"Ajmaq":["E'","Tz'i'","Kat","Tijax","Qanil","Iq'","Ajmaq","Tz'i'","Kat","I'x","Qanil","Iq'","Ajpu'"],"N'oj":["Aj","B'atz'","Kan","Kawoq","Toj","Aq'ab'al","N'oj","B'atz'","Kan","Tz'ikin","Toj","Aq'ab'al","Imox"],"Tijax":["I'x","E'","Kame","Ajpu'","Tz'i'","Kat","Tijax","E'","Kame","Ajmaq","Tz'i'","Kat","Iq'"],"Kawoq":["Tz'ikin","Aj","Kej","Imox","B'atz'","Kan","Kawoq","Aj","Kej","N'oj","B'atz'","Kan","Aq'ab'al"],"Ajpu'":["Ajmaq","I'x","Qanil","Iq'","E'","Kame","Ajpu'","I'x","Qanil","Tijax","E'","Kame","Kat"]};
+const cruces={
+    "Imox":["N'oj","Tz'ikin","Toj","Aq'ab'al","Aj","Kej","Imox","Tz'ikin","Toj","Kawoq","Aj","Kej","Kan"],
+    "Iq'":["Tijax","Ajmaq","Tz'i'","Kat","I'x","Qanil","Iq'","Ajmaq","Tz'i'","Ajpu","I'x","Qanil","Kame"],
+    "Aq'ab'al":["Kawoq","N'oj","B'atz'","Kan","Tz'ikin","Toj","Aq'ab'al","N'oj","B'atz'","Imox","Tz'ikin","Toj","Kej"],
+    "K'at":["Ajpu'","Tijax","E'","Kame","Ajmaq","Tz'i'","K'at","Tijax","E'","Iq'","Ajmaq","Tz'i'","Qanil"],
+    "Kan":["Imox","Kawoq","Aj","Kej","N'oj","B'atz'","Kan","Kawoq","Aj","Aq'ab'al","N'oj","B'atz'","Toj"],
+    "Kame":["Iq'","Ajpu'","I'x","Qanil","Tijax","E'","Kame","Ajpu'","I'x","Kat","Tijax","E'","Tz'i'"],
+    "Kej":["Aq'ab'al","Imox","Tz'ikin","Toj","Kawoq","Aj","Kej","Imox","Tz'ikin","Kan","Kawoq","Aj","B'atz'"],
+    "Q'anil":["Kat","Iq'","Ajmaq","Tz'i'","Ajpu'","I'x","Q'anil","Iq'","Ajmaq","Kame","Ajpu'","I'x","E'"],
+    "Toj":["Kan","Aq'ab'al","N'oj","B'atz'","Imox","Tz'ikin","Toj","Aq'ab'al","N'oj","Kej","Imox","Tz'ikin","Aj"],
+    "Tz'i'":["Kame","Kat","Tijax","E'","Iq'","Ajmaq","Tz'i'","Kat","Tijax","Qanil","Iq'","Ajmaq","I'x"],
+    "B'atz'":["Kej","Kan","Kawoq","Aj","Aq'ab'al","N'oj","B'atz'","Kan","Kawoq","Toj","Aq'ab'al","N'oj","Tz'ikin"],
+    "E'":["Qanil","Kame","Ajpu'","I'x","Kat","Tijax","E'","Kame","Ajpu'","Tz'i'","Kat","Tijax","Ajmaq"],
+    "Aj":["Toj","Kej","Imox","Tz'ikin","Kan","Kawoq","Aj","Kej","Imox","B'atz'","Kan","Kawoq","N'oj"],
+    "I'x":["Tz'i'","Qanil","Iq'","Ajmaq","Kame","Ajpu'","I'x","Qanil","Iq'","E'","Kame","Ajpu'","Tijax"],
+    "Tz'ikin":["B'atz'","Toj","Aq'ab'al","N'oj","Kej","Imox","Tz'ikin","Toj","Aq'ab'al","Aj","Kej","Imox","Kawoq"],
+    "Ajmaq":["E'","Tz'i'","Kat","Tijax","Qanil","Iq'","Ajmaq","Tz'i'","Kat","I'x","Qanil","Iq'","Ajpu'"],
+    "N'oj":["Aj","B'atz'","Kan","Kawoq","Toj","Aq'ab'al","N'oj","B'atz'","Kan","Tz'ikin","Toj","Aq'ab'al","Imox"],
+    "Tijax":["I'x","E'","Kame","Ajpu'","Tz'i'","Kat","Tijax","E'","Kame","Ajmaq","Tz'i'","Kat","Iq'"],
+    "Kawoq":["Tz'ikin","Aj","Kej","Imox","B'atz'","Kan","Kawoq","Aj","Kej","N'oj","B'atz'","Kan","Aq'ab'al"],
+    "Ajpu'":["Ajmaq","I'x","Qanil","Iq'","E'","Kame","Ajpu'","I'x","Qanil","Tijax","E'","Kame","Kat"]
+};
 const numBase=[4,2,9,3,13,7,1,8,2,12,6,13,11];
 const coord={0:{r:0,c:2},1:{r:1,c:1},2:{r:1,c:2},3:{r:1,c:3},4:{r:2,c:0},5:{r:2,c:1},6:{r:2,c:2},7:{r:2,c:3},8:{r:2,c:4},9:{r:3,c:1},10:{r:3,c:2},11:{r:3,c:3},12:{r:4,c:2}};
 
@@ -150,7 +170,7 @@ function trecena(c){return nawalesConAp[(c.idx-(c.tono-1)+20)%20];}
 const trecenasElegantes = {
     "Imox":"La Trecena de Imox te sitúa en el útero cósmico y el mar mental. Si no haces consciente lo que habita en tus aguas profundas, el destino traerá naufragios para obligarte a aprender a nadar. Arquitectónicamente, nacer bajo esta frecuencia es habitar un terreno con napas freáticas altas: si no impermeabilizas tu mente con límites claros, tu estructura emocional se hundirá.",
     "Iq'":"La Trecena de Iq' rige el aliento, la palabra y el espíritu del cambio. Lo que callas hoy se convertirá en un síntoma mañana; tu palabra es el pincel de tu realidad biológica. Tu diseño es aerodinámico, hecho para el flujo. Si te estancas en ideas rígidas, la presión del estrés derribará tus muros.",
-    "Aq'ab'al":"La Trecena de Aq'ab'al es el umbral donde la luz y la sombra se encuentran. Para que el sol salga en tu vida, debes aceptar la oscuridad que aún guardas en el sótano. Eres una estructura de transición constante.",
+    "Aq'ab'al":"La Trecena de Aq'ab'al es el umbral donde la luz y la sombra se encuentran. Para que el sol salga en tu vida, debes aceptar la oscuridad que aún guardas en el sótano. Eres una estructura de transición constante, renovando la fachada de lo que fuiste.",
     "K'at":"La Trecena de K'at habla de redes, abundancia y las ataduras invisibles. Tus bloqueos no son falta de suerte, sino una red de lealtades familiares que impiden prosperar para no superar a tus antepasados.",
     "Kan":"La Trecena de Kan es la serpiente, la energía vital y la justicia interna. Tu diseño tiene una instalación eléctrica de alta tensión; si no tienes una buena toma de tierra basada en la humildad, la potencia de tu nawal quemará tus circuitos internos.",
     "Kame":"La Trecena de Kame gobierna los ciclos, los ancestros y la muerte simbólica. Morir simbólicamente es soltar el programa del pasado; el perdón libera tu carga biológica. No temas demoler muros viejos para construir lo nuevo.",
@@ -171,7 +191,7 @@ const trecenasElegantes = {
 };
 
 function mkGrid(g){let gr=Array(5).fill(null).map(()=>Array(5).fill(null));g.forEach(p=>{const pos=coord[p.posIndex];if(pos)gr[pos.r][pos.c]=p;});return gr;}
-function mkImg(nawal,cls){const img=document.createElement('img');img.className=cls;img.src=`nahuales/${nawal}.png`;img.onerror=function(){this.style.display='none';const fb=document.createElement('span');fb.style.cssText='font-size:0.7rem;color:#ccc;';fb.innerText=nawal.charAt(0);this.parentNode.insertBefore(fb,this);};return img;}
+function mkImg(nawal,cls){const img=document.createElement('img');img.className=cls;img.src=`nahuales/${nawal.toLowerCase()}.png`;img.onerror=function(){this.style.display='none';const fb=document.createElement('span');fb.style.cssText='font-size:0.7rem;color:#ccc;';fb.innerText=nawal.charAt(0);this.parentNode.insertBefore(fb,this);};return img;}
 function dibujarIndividual(g,contId){const cont=document.getElementById(contId);cont.innerHTML='';const gr=mkGrid(g);for(let r=0;r<5;r++)for(let c=0;c<5;c++){const it=gr[r][c];if(!it){const e=document.createElement('div');e.style.cssText='visibility:hidden;';cont.appendChild(e);continue;}const card=document.createElement('div');card.className='nawal-item';if(it.posIndex===6)card.classList.add('item-center');const lbl=document.createElement('div');lbl.className='nawal-label';lbl.innerText=it.nawal;const num=document.createElement('div');num.className='nawal-num';num.innerText=it.tono;card.append(mkImg(it.nawal,'nawal-img'),lbl,num);cont.appendChild(card);}}
 function dibujarComparativa(gArr,gAba,contId,tagArr,tagAba){const cont=document.getElementById(contId);cont.innerHTML='';const mA={},mB={};gArr.forEach(p=>mA[p.posIndex]=p);gAba.forEach(p=>mB[p.posIndex]=p);const gr=mkGrid(gArr);for(let r=0;r<5;r++)for(let c=0;c<5;c++){const pi=gr[r][c]?.posIndex;if(pi===undefined||pi===null){const e=document.createElement('div');e.style.cssText='visibility:hidden;';cont.appendChild(e);continue;}const iA=mA[pi],iB=mB[pi];const card=document.createElement('div');card.className='nawal-item';if(pi===6)card.classList.add('item-center');const dual=document.createElement('div');dual.className='dual-nawal';const fila=(it,tag,cls)=>{const row=document.createElement('div');row.className='dual-row';const t=document.createElement('div');t.className=`dual-tag ${cls}`;t.innerText=tag;const lbl=document.createElement('div');lbl.className='nawal-label-dual';lbl.innerText=it.nawal;const num=document.createElement('div');num.className='nawal-num-dual';num.innerText=it.tono;row.append(t,mkImg(it.nawal,'nawal-img-dual'),lbl,num);return row;};const sep=document.createElement('div');sep.className='sep-dual';dual.append(fila(iA,tagArr,'tag-'+tagArr.toLowerCase()),sep,fila(iB,tagAba,'tag-'+tagAba.toLowerCase()));card.appendChild(dual);cont.appendChild(card);}}
 
@@ -195,20 +215,34 @@ function buildPrompt(tipo,cA,gA,nA,trA,cB,gB,nB,trB,vinc){
 }
 
 /* ================================================================
-   LLAMADA A GEMINI CON REINTENTOS AUTOMÁTICOS Y ROTACIÓN DE KEYS
+   LLAMADA A GEMINI A TRAVÉS DEL PROXY (TIPO COMPARATIVO)
    ================================================================ */
 async function llamarGemini(prompt){
     for(let i=0;i<5;i++){
         try{
-            const r=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=${getKey()}`,{
-                method:'POST',headers:{'Content-Type':'application/json'},
-                body:JSON.stringify({contents:[{parts:[{text:prompt}]}],generationConfig:{temperature:0.88,maxOutputTokens:4000}})
+            const r=await fetch('/api/generar',{
+                method:'POST',
+                headers:{'Content-Type':'application/json'},
+                body:JSON.stringify({ prompt, tipo: 'comparativo' })
             });
-            if(r.status===429){const w=Math.pow(10,i+1)*1000;console.warn(`429 Rate limit. Reintento ${i+1}/5 en ${w/1000}s`);await new Promise(res=>setTimeout(res,w));continue;}
-            if(r.status===503){const w=Math.pow(8,i+1)*1000;console.warn(`503 Sobrecarga. Reintento ${i+1}/5 en ${w/1000}s`);await new Promise(res=>setTimeout(res,w));continue;}
-            if(!r.ok){const e=await r.json();console.error('GEMINI ERROR:',JSON.stringify(e,null,2));throw new Error(e.error?.message||'Error Gemini');}
-            const d=await r.json();return d.candidates?.[0]?.content?.parts?.[0]?.text||'';
-        }catch(err){if(i===4)throw err;console.warn(`Error red. Reintento ${i+1}/5 en 4s`);await new Promise(res=>setTimeout(res,4000));}
+            if(r.status===429||r.status===503){
+                const espera = r.status===429 ? Math.pow(10,i+1)*1000 : Math.pow(8,i+1)*1000;
+                console.warn(`Reintento ${i+1}/5 en ${espera/1000}s`);
+                await new Promise(res=>setTimeout(res,espera));
+                continue;
+            }
+            if(!r.ok){
+                const e=await r.json().catch(()=>({}));
+                throw new Error(e.error||`Error ${r.status}`);
+            }
+            const d=await r.json();
+            if(!d.texto||d.texto.length<100) throw new Error("Respuesta vacía");
+            return d.texto;
+        }catch(err){
+            if(i===4) throw err;
+            console.warn(`Error red. Reintento ${i+1}/5 en 4s`);
+            await new Promise(res=>setTimeout(res,4000));
+        }
     }
     return '';
 }
@@ -246,13 +280,20 @@ async function iniciar(){
     document.getElementById('hdr-AB').innerHTML=`${pA} / ${pB}`;
     document.getElementById('hdr-BA').innerHTML=`${pB} / ${pA}`;
     const btn=document.getElementById('btn-pdf'); btn.disabled=false; btn.textContent='DESCARGAR REPORTE PDF';
-    if(GEMINI_KEYS[0]&&GEMINI_KEYS[0].length>20){
-        const pasos=[{k:'AB',sp:'spin-AB',bl:'bloque-AB',tx:'txt-AB'},{k:'BA',sp:'spin-BA',bl:'bloque-BA',tx:'txt-BA'}];
-        for(let idx=0;idx<pasos.length;idx++){const paso=pasos[idx];document.getElementById(paso.sp).style.display='block';
+    const pasos=[{k:'AB',sp:'spin-AB',bl:'bloque-AB',tx:'txt-AB'},{k:'BA',sp:'spin-BA',bl:'bloque-BA',tx:'txt-BA'}];
+    for(let idx=0;idx<pasos.length;idx++){
+        const paso=pasos[idx];
+        document.getElementById(paso.sp).style.display='block';
         if(idx>0)await new Promise(r=>setTimeout(r,5000));
-        try{const t=await llamarGemini(buildPrompt(paso.k,cA,gA,nA,trA,cB,gB,nB,trB,vinc));nar[paso.k]=t;document.getElementById(paso.tx).innerHTML=a2html(t);}
-        catch(e){document.getElementById(paso.tx).innerHTML=`<p style="color:#c0392b;">Error al generar la narrativa: ${e.message}</p>`;}
-        document.getElementById(paso.sp).style.display='none';document.getElementById(paso.bl).style.display='block';}
+        try{
+            const t=await llamarGemini(buildPrompt(paso.k,cA,gA,nA,trA,cB,gB,nB,trB,vinc));
+            nar[paso.k]=t;
+            document.getElementById(paso.tx).innerHTML=a2html(t);
+        }catch(e){
+            document.getElementById(paso.tx).innerHTML=`<p style="color:#c0392b;">Error al generar la narrativa: ${e.message}</p>`;
+        }
+        document.getElementById(paso.sp).style.display='none';
+        document.getElementById(paso.bl).style.display='block';
     }
 }
 
@@ -367,10 +408,8 @@ async function generarPDF(){
     if(logo){const lw=68,lh=lw*(logo.h/logo.w);doc.addImage(logo.d,'PNG',(pW-lw)/2,y,lw,lh);y+=lh+16;}
     doc.setFontSize(24);doc.setFont('times','italic');doc.setTextColor(10,10,10);doc.text('Sincronia de Energias',pW/2,y,{align:'center'});y+=14;
     doc.setFontSize(18);doc.setFont('times','italic');doc.setTextColor(46,139,87);doc.text(`${dA.nombre}  \u00b7  ${dB.nombre}`,pW/2,y,{align:'center'});y+=12;
-    /* PAREJA — MISMA TIPOGRAFÍA QUE EL TEXTO VERDE: times italic, color accent */
     doc.setFontSize(16);doc.setFont('times','italic');doc.setTextColor(46,139,87);doc.text(vinc,pW/2,y,{align:'center'});y+=10;
     doc.setDrawColor(46,139,87);doc.setLineWidth(0.3);doc.line(mI+15,y,pW-mD-15,y);y+=10;
-    /* Tira gris con fechas y email */
     const stripH=dA.email?30:22;
     doc.setFillColor(234,234,234);doc.rect(mI,y,aU,stripH,'F');y+=8;
     doc.setFontSize(9.5);doc.setFont('times','italic');doc.setTextColor(60,60,60);
