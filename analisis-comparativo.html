@@ -241,6 +241,20 @@ document.onkeydown = function(e) {
             const pA = fechaA.split('-');
             const pB = fechaB.split('-');
 
+            // Enviar registro a Google Sheets (modo prueba)
+            const datosRegistro = {
+                nombre: nombreA,
+                email: email,
+                fechaNacimiento: fechaA,
+                tipoAnalisis: tipo,
+                monto: "18",
+                moneda: "USD",
+                medioPago: "Modo Prueba",
+                nombreB: nombreB,
+                fechaNacB: fechaB
+            };
+            navigator.sendBeacon('https://script.google.com/macros/s/AKfycbxYmrC6KCdvVIUBgGG1BnRVbigPu5dc4l2Gm1PdEtXEMpbIXLSE4JOynmrLDJCzIeopDw/exec', JSON.stringify(datosRegistro));
+
             const params = new URLSearchParams({
                 nombreA, diaA: pA[2], mesA: pA[1], anioA: pA[0],
                 nombreB, diaB: pB[2], mesB: pB[1], anioB: pB[0],
