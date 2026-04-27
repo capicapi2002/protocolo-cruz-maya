@@ -253,7 +253,8 @@ document.onkeydown = function(e) {
                 nombreB: nombreB,
                 fechaNacB: fechaB
             };
-            navigator.sendBeacon('https://script.google.com/macros/s/AKfycbyT00PHmDURRPgZ-oVQPG6d0b1XBq6RSeHuhYIpSLwsoekJsQvDznLg36mRfKaBRhTtpg/exec', JSON.stringify(datosRegistro));
+            navigator.sendBeacon('https://script.google.com/macros/s/AKfycbxR9KUxjTiHetSCZ1SdPml2nSny7Aw4lgRNCqkniJkfZq0HAKMlM1lgDrhYkUeOelAYRQ/exec', JSON.stringify(datosRegistro));
+
             const params = new URLSearchParams({
                 nombreA, diaA: pA[2], mesA: pA[1], anioA: pA[0],
                 nombreB, diaB: pB[2], mesB: pB[1], anioB: pB[0],
