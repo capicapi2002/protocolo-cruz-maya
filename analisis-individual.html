@@ -214,8 +214,7 @@ document.onkeydown = function(e) {
                 moneda: "USD",
                 medioPago: "Modo Prueba"
             };
-            navigator.sendBeacon('https://script.google.com/macros/s/AKfycbxYmrC6KCdvVIUBgGG1BnRVbigPu5dc4l2Gm1PdEtXEMpbIXLSE4JOynmrLDJCzIeopDw/exec', JSON.stringify(datosRegistro));
-
+            navigator.sendBeacon('https://script.google.com/macros/s/AKfycbyT00PHmDURRPgZ-oVQPG6d0b1XBq6RSeHuhYIpSLwsoekJsQvDznLg36mRfKaBRhTtpg/exec', JSON.stringify(datosRegistro));
             const params = new URLSearchParams({ 
                 modo: 'pago', 
                 nombre, 
