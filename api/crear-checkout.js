@@ -18,7 +18,7 @@ export default async function handler(req, res) {
       quantity: 1,
     }],
     mode: 'payment',
-    success_url: `https://protocolo-cruz-maya.vercel.app/resultado-${analisis}.html?nombre=${nombre}&email=${email}&dia=${fechaNacA.split('-')[2]}&mes=${fechaNacA.split('-')[1]}&anio=${fechaNacA.split('-')[0]}&tipo=${tipoAnalisis}&modo=pago`,
+    success_url: `https://protocolo-cruz-maya.vercel.app/resultado-cruz.html?nombre=${nombre}&email=${email}&dia=${fechaNacA.split('-')[2]}&mes=${fechaNacA.split('-')[1]}&anio=${fechaNacA.split('-')[0]}&tipo=${tipoAnalisis}&modo=pago`,
     cancel_url: 'https://protocolo-cruz-maya.vercel.app/index.html',
     metadata: {
       analisis, nombre, email, fechaNacA, fechaNacB, tipoAnalisis, precio
