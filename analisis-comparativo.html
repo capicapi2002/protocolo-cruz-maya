@@ -179,11 +179,8 @@ document.onkeydown = function(e) {
                     <input type="email" name="email" placeholder="Email para recibir tu informe PDF" required>
                 </div>
 
-                <!-- MODO PRUEBA: botón saltea pago. REACTIVAR PAGO antes de publicar -->
-                <button type="button" class="btn-generate" onclick="irAResultadoComparativo()">INICIAR SINCRONÍA (MODO PRUEBA)_</button>
-                <!-- PRODUCCIÓN: descomentar y borrar botón de arriba
-                <button type="button" class="btn-generate" onclick="irAPago()">PROCESAR PAGO Y DECODIFICAR — $<span id="precio-comparativa">18</span>_</button>
-                -->
+                <!-- BOTÓN DE PAGO REAL CON STRIPE -->
+                <button type="button" class="btn-generate" onclick="pagarComparativo()">PAGAR Y DECODIFICAR — $<span id="precio-comparativa">18</span></button>
             </form>
         </div>
     </main>
@@ -227,7 +224,7 @@ document.onkeydown = function(e) {
         }
         init(); animate(); window.addEventListener('resize', init);
 
-        function irAResultadoComparativo() {
+        async function pagarComparativo() {
             const nombreA = document.querySelector('[name="nombreA"]').value.trim();
             const fechaA  = document.querySelector('[name="fechaA"]').value;
             const nombreB = document.querySelector('[name="nombreB"]').value.trim();
@@ -238,29 +235,40 @@ document.onkeydown = function(e) {
             if (!nombreA || !fechaA || !nombreB || !fechaB || !tipo || !email) {
                 alert("Por favor completa todos los campos."); return;
             }
-            const pA = fechaA.split('-');
-            const pB = fechaB.split('-');
 
-            // Enviar registro a Google Sheets (modo prueba) con monto dinámico
+            // Enviar registro a Google Sheets (modo prueba con monto dinámico)
             const datosRegistro = {
                 nombre: nombreA,
                 email: email,
                 fechaNacimiento: fechaA,
                 tipoAnalisis: tipo,
-                monto: precios.comparativa.toString(),   // ← Toma el precio real de precios.js
+                monto: precios.comparativa.toString(),
                 moneda: "USD",
-                medioPago: "Modo Prueba",
+                medioPago: "Stripe",
                 nombreB: nombreB,
                 fechaNacB: fechaB
             };
             navigator.sendBeacon('https://script.google.com/macros/s/AKfycbxR9KUxjTiHetSCZ1SdPml2nSny7Aw4lgRNCqkniJkfZq0HAKMlM1lgDrhYkUeOelAYRQ/exec', JSON.stringify(datosRegistro));
 
-            const params = new URLSearchParams({
-                nombreA, diaA: pA[2], mesA: pA[1], anioA: pA[0],
-                nombreB, diaB: pB[2], mesB: pB[1], anioB: pB[0],
-                tipo_comparativa: tipo, email
+            const res = await fetch('/api/crear-checkout', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    analisis: 'comparativa',
+                    nombre: nombreA,
+                    email: email,
+                    fechaNacA: fechaA,
+                    fechaNacB: fechaB,
+                    tipoAnalisis: tipo,
+                    precio: precios.comparativa.toString()
+                })
             });
-            window.location.href = "resultado-comparativo.html?" + params.toString();
+            const data = await res.json();
+            if (data.url) {
+                window.location.href = data.url;
+            } else {
+                alert("Error al iniciar el pago. Inténtelo de nuevo.");
+            }
         }
     </script>
 </body>

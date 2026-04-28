@@ -149,11 +149,8 @@ document.onkeydown = function(e) {
                     <input type="email" name="email" placeholder="Email para recibir tu informe PDF" required>
                 </div>
 
-                <!-- MODO PRUEBA: botón saltea pago. REACTIVAR PAGO antes de publicar -->
-                <button type="button" class="btn-generate" onclick="irAResultado()">INICIAR ANÁLISIS (MODO PRUEBA)</button>
-                <!-- PRODUCCIÓN: descomentar la línea siguiente y borrar el botón de arriba
-                <button type="button" class="btn-generate" onclick="irAPago()">PROCESAR PAGO Y DECODIFICAR — $<span id="precio-individual">10</span></button>
-                -->
+                <!-- BOTÓN DE PAGO REAL CON STRIPE -->
+                <button type="button" class="btn-generate" onclick="pagarIndividual()">PAGAR Y DECODIFICAR — $<span id="precio-individual">10</span></button>
             </form>
         </div>
     </main>
@@ -192,7 +189,7 @@ document.onkeydown = function(e) {
         }
         init(); animate(); window.addEventListener('resize', init);
 
-        function irAResultado() {
+        async function pagarIndividual() {
             const nombre = document.querySelector('[name="nombre"]').value.trim();
             const fecha  = document.querySelector('[name="fecha"]').value;
             const tipo   = document.querySelector('[name="tipo_cruz"]').value;
@@ -201,31 +198,37 @@ document.onkeydown = function(e) {
             if (!nombre || !fecha || !tipo || !email) {
                 alert("Por favor completa todos los campos."); return;
             }
-            const partes = fecha.split('-');
-            const anio = partes[0], mes = partes[1], dia = partes[2];
 
-            // Enviar registro a Google Sheets (modo prueba) con monto dinámico
+            // Enviar registro a Google Sheets (modo prueba con monto dinámico)
             const datosRegistro = {
                 nombre: nombre,
                 email: email,
                 fechaNacimiento: fecha,
                 tipoAnalisis: tipo,
-                monto: precios.individual.toString(),   // ← Toma el precio real de precios.js
+                monto: precios.individual.toString(),
                 moneda: "USD",
-                medioPago: "Modo Prueba"
+                medioPago: "Stripe"
             };
             navigator.sendBeacon('https://script.google.com/macros/s/AKfycbxR9KUxjTiHetSCZ1SdPml2nSny7Aw4lgRNCqkniJkfZq0HAKMlM1lgDrhYkUeOelAYRQ/exec', JSON.stringify(datosRegistro));
 
-            const params = new URLSearchParams({ 
-                modo: 'pago', 
-                nombre, 
-                dia, 
-                mes, 
-                anio, 
-                email, 
-                tipo: tipo 
+            const res = await fetch('/api/crear-checkout', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    analisis: 'individual',
+                    nombre: nombre,
+                    email: email,
+                    fechaNacA: fecha,
+                    tipoAnalisis: tipo,
+                    precio: precios.individual.toString()
+                })
             });
-            window.location.href = "resultado-cruz.html?" + params.toString();
+            const data = await res.json();
+            if (data.url) {
+                window.location.href = data.url;
+            } else {
+                alert("Error al iniciar el pago. Inténtelo de nuevo.");
+            }
         }
     </script>
 </body>
