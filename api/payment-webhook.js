@@ -1,4 +1,3 @@
-// api/payment-webhook.js
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
 export default async function handler(req, res) {
@@ -18,7 +17,6 @@ export default async function handler(req, res) {
     const session = event.data.object;
     const { analisis, nombre, email, fechaNacA, fechaNacB, tipoAnalisis, precio } = session.metadata;
 
-    // Registrar en Google Sheets
     const datos = {
       nombre: nombre,
       email: email,
@@ -34,7 +32,6 @@ export default async function handler(req, res) {
       body: JSON.stringify(datos)
     });
 
-    // Redirigir al resultado
     const params = new URLSearchParams({
       nombre: nombre,
       email: email,
