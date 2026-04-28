@@ -152,7 +152,7 @@ document.onkeydown = function(e) {
                 <!-- MODO PRUEBA: botón saltea pago. REACTIVAR PAGO antes de publicar -->
                 <button type="button" class="btn-generate" onclick="irAResultado()">INICIAR ANÁLISIS (MODO PRUEBA)</button>
                 <!-- PRODUCCIÓN: descomentar la línea siguiente y borrar el botón de arriba
-                <button type="button" class="btn-generate" onclick="irAPago()">PROCESAR PAGO Y DECODIFICAR — $<span id="precio-individual">15</span></button>
+                <button type="button" class="btn-generate" onclick="irAPago()">PROCESAR PAGO Y DECODIFICAR — $<span id="precio-individual">10</span></button>
                 -->
             </form>
         </div>
@@ -204,13 +204,13 @@ document.onkeydown = function(e) {
             const partes = fecha.split('-');
             const anio = partes[0], mes = partes[1], dia = partes[2];
 
-            // Enviar registro a Google Sheets (modo prueba)
+            // Enviar registro a Google Sheets (modo prueba) con monto dinámico
             const datosRegistro = {
                 nombre: nombre,
                 email: email,
                 fechaNacimiento: fecha,
                 tipoAnalisis: tipo,
-                monto: "15",
+                monto: precios.individual.toString(),   // ← Toma el precio real de precios.js
                 moneda: "USD",
                 medioPago: "Modo Prueba"
             };

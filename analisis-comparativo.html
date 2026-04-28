@@ -241,13 +241,13 @@ document.onkeydown = function(e) {
             const pA = fechaA.split('-');
             const pB = fechaB.split('-');
 
-            // Enviar registro a Google Sheets (modo prueba)
+            // Enviar registro a Google Sheets (modo prueba) con monto dinámico
             const datosRegistro = {
                 nombre: nombreA,
                 email: email,
                 fechaNacimiento: fechaA,
                 tipoAnalisis: tipo,
-                monto: "18",
+                monto: precios.comparativa.toString(),   // ← Toma el precio real de precios.js
                 moneda: "USD",
                 medioPago: "Modo Prueba",
                 nombreB: nombreB,
