@@ -179,7 +179,12 @@ document.onkeydown = function(e) {
                     <input type="email" name="email" placeholder="Email para recibir tu informe PDF" required>
                 </div>
 
-                <!-- BOTÓN DE PAGO REAL CON STRIPE -->
+                <div class="form-group">
+                    <label>Código promocional</label>
+                    <input type="text" name="codigo_acceso" placeholder="Código de acceso (opcional)">
+                </div>
+
+                <!-- BOTÓN DE PAGO CON STRIPE + CÓDIGO MAESTRO -->
                 <button type="button" class="btn-generate" onclick="pagarComparativo()">PAGAR Y DECODIFICAR — $<span id="precio-comparativa">18</span></button>
             </form>
         </div>
@@ -231,12 +236,46 @@ document.onkeydown = function(e) {
             const fechaB  = document.querySelector('[name="fechaB"]').value;
             const tipo    = document.querySelector('[name="tipo_comparativa"]').value;
             const email   = document.querySelector('[name="email"]').value.trim();
+            const codigo  = document.querySelector('[name="codigo_acceso"]').value.trim();
 
             if (!nombreA || !fechaA || !nombreB || !fechaB || !tipo || !email) {
                 alert("Por favor completa todos los campos."); return;
             }
+            const pA = fechaA.split('-');
+            const pB = fechaB.split('-');
 
-            // Enviar registro a Google Sheets (modo prueba con monto dinámico)
+            // Verificar código maestro
+            if (codigo) {
+                const respuesta = await fetch('/api/verificar-codigo', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ codigo: codigo })
+                });
+                const resultado = await respuesta.json();
+                if (resultado.valido) {
+                    const datosRegistro = {
+                        nombre: nombreA,
+                        email: email,
+                        fechaNacimiento: fechaA,
+                        tipoAnalisis: tipo,
+                        monto: "0",
+                        moneda: "USD",
+                        medioPago: "Código Maestro",
+                        nombreB: nombreB,
+                        fechaNacB: fechaB
+                    };
+                    navigator.sendBeacon('https://script.google.com/macros/s/AKfycbxR9KUxjTiHetSCZ1SdPml2nSny7Aw4lgRNCqkniJkfZq0HAKMlM1lgDrhYkUeOelAYRQ/exec', JSON.stringify(datosRegistro));
+                    const params = new URLSearchParams({
+                        nombreA, diaA: pA[2], mesA: pA[1], anioA: pA[0],
+                        nombreB, diaB: pB[2], mesB: pB[1], anioB: pB[0],
+                        tipo_comparativa: tipo, email
+                    });
+                    window.location.href = "resultado-comparativo.html?" + params.toString();
+                    return;
+                }
+            }
+
+            // Flujo normal de Stripe
             const datosRegistro = {
                 nombre: nombreA,
                 email: email,
@@ -273,4 +312,3 @@ document.onkeydown = function(e) {
     </script>
 </body>
 </html>
-<!-- v1.2 Código Maestro -->

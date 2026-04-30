@@ -149,7 +149,12 @@ document.onkeydown = function(e) {
                     <input type="email" name="email" placeholder="Email para recibir tu informe PDF" required>
                 </div>
 
-                <!-- BOTÓN DE PAGO REAL CON STRIPE -->
+                <div class="form-group">
+                    <label>Código promocional</label>
+                    <input type="text" name="codigo_acceso" placeholder="Código de acceso (opcional)">
+                </div>
+
+                <!-- BOTÓN DE PAGO CON STRIPE + CÓDIGO MAESTRO -->
                 <button type="button" class="btn-generate" onclick="pagarIndividual()">PAGAR Y DECODIFICAR — $<span id="precio-individual">10</span></button>
             </form>
         </div>
@@ -194,12 +199,48 @@ document.onkeydown = function(e) {
             const fecha  = document.querySelector('[name="fecha"]').value;
             const tipo   = document.querySelector('[name="tipo_cruz"]').value;
             const email  = document.querySelector('[name="email"]').value.trim();
+            const codigo = document.querySelector('[name="codigo_acceso"]').value.trim();
 
             if (!nombre || !fecha || !tipo || !email) {
                 alert("Por favor completa todos los campos."); return;
             }
+            const partes = fecha.split('-');
+            const anio = partes[0], mes = partes[1], dia = partes[2];
 
-            // Enviar registro a Google Sheets (modo prueba con monto dinámico)
+            // Verificar código maestro
+            if (codigo) {
+                const respuesta = await fetch('/api/verificar-codigo', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ codigo: codigo })
+                });
+                const resultado = await respuesta.json();
+                if (resultado.valido) {
+                    const datosRegistro = {
+                        nombre: nombre,
+                        email: email,
+                        fechaNacimiento: fecha,
+                        tipoAnalisis: tipo,
+                        monto: "0",
+                        moneda: "USD",
+                        medioPago: "Código Maestro"
+                    };
+                    navigator.sendBeacon('https://script.google.com/macros/s/AKfycbxR9KUxjTiHetSCZ1SdPml2nSny7Aw4lgRNCqkniJkfZq0HAKMlM1lgDrhYkUeOelAYRQ/exec', JSON.stringify(datosRegistro));
+                    const params = new URLSearchParams({ 
+                        modo: 'pago', 
+                        nombre, 
+                        dia, 
+                        mes, 
+                        anio, 
+                        email, 
+                        tipo: tipo 
+                    });
+                    window.location.href = "resultado-cruz.html?" + params.toString();
+                    return;
+                }
+            }
+
+            // Si no hay código o es inválido, flujo normal de Stripe
             const datosRegistro = {
                 nombre: nombre,
                 email: email,
@@ -233,4 +274,3 @@ document.onkeydown = function(e) {
     </script>
 </body>
 </html>
-<!-- v1.2 Código Maestro -->
