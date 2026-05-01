@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+
+Sitemap: https://protocolo-cruz-maya.vercel.app/sitemap.xml
+Sitemap: https://protocolo-cruz-maya.vercel.app/sitemap.txt
