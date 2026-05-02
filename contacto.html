@@ -50,12 +50,11 @@
         }
         .logo-small { width: 170px; height: auto; cursor: pointer; }
 
-        /* --- ZONA GRIS AJUSTADA (MÁS ESTRECHA Y SEPARADA) --- */
         .intro-zone {
             background-color: var(--grey-zone);
-            padding: 40px 20px; /* Reducido a la mitad para que sea estrecha */
+            padding: 40px 20px;
             text-align: center;
-            margin: 40px 0; /* Margen para ver el fondo dinámico arriba y abajo */
+            margin: 40px 0;
             border-top: 1px solid rgba(0,0,0,0.05);
             border-bottom: 1px solid rgba(0,0,0,0.05);
             position: relative;
@@ -68,7 +67,6 @@
         }
         .intro-zone h2 i { color: var(--accent); font-style: italic; }
 
-        /* --- TIRA NEGRA --- */
         .form-strip {
             background-color: var(--black);
             color: var(--white);
@@ -97,7 +95,6 @@
         }
         .group input:focus, .group textarea:focus { border-color: var(--accent); outline: none; }
 
-        /* --- BOTÓN CEREBRO --- */
         .submit-area {
             display: flex;
             flex-direction: column;
@@ -139,7 +136,6 @@
             margin-top: 10px;
         }
 
-        /* --- REDES SOCIALES --- */
         .social-area {
             padding: 80px 0;
             text-align: center;
@@ -167,7 +163,14 @@
         }
     </style>
 </head>
-<body>
+<body oncontextmenu="return false">
+<script>
+document.onkeydown = function(e) {
+    if (e.keyCode == 123 || (e.ctrlKey && e.shiftKey && e.keyCode == 73) || (e.ctrlKey && e.keyCode == 85)) {
+        return false;
+    }
+};
+</script>
 
     <canvas id="bg-canvas"></canvas>
 
@@ -212,11 +215,11 @@
     <section class="social-area">
         <h4>SIGUENOS EN REDES SOCIALES</h4>
         <div class="icons">
-            <a href="#"><i class="fab fa-instagram"></i></a>
-            <a href="#"><i class="fab fa-youtube"></i></a>
-            <a href="#"><i class="fab fa-facebook"></i></a>
-            <a href="#"><i class="fab fa-x-twitter"></i></a>
-            <a href="#"><i class="fab fa-tiktok"></i></a>
+            <a href="https://www.facebook.com/1037161592821744" target="_blank"><i class="fab fa-facebook"></i></a>
+            <a href="https://www.instagram.com/protocolo.cruzmaya/" target="_blank"><i class="fab fa-instagram"></i></a>
+            <a href="https://www.tiktok.com/@protocolocruzmaya" target="_blank"><i class="fab fa-tiktok"></i></a>
+            <a href="https://www.youtube.com/@ProtocoloCruzMaya" target="_blank"><i class="fab fa-youtube"></i></a>
+            <a href="https://x.com/X_cruz_maya" target="_blank"><i class="fab fa-x-twitter"></i></a>
         </div>
     </section>
 
@@ -254,7 +257,7 @@
         });
         function animate() {
             ctx.clearRect(0,0,canvas.width, canvas.height);
-            ctx.strokeStyle = "rgba(46, 139, 87, 0.3)"; 
+            ctx.strokeStyle = "rgba(46, 139, 87, 0.3)";
             ctx.fillStyle = "rgba(0,0,0,0.12)";
             points.forEach((p, i) => {
                 p.x += p.vx; p.y += p.vy;

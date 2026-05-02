@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Metodología — Protocolo Cruz Maya</title>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@100;300;400&family=Space+Mono&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root {
             --black: #0A0A0A;
@@ -197,7 +198,14 @@
         }
     </style>
 </head>
-<body>
+<body oncontextmenu="return false">
+<script>
+document.onkeydown = function(e) {
+    if (e.keyCode == 123 || (e.ctrlKey && e.shiftKey && e.keyCode == 73) || (e.ctrlKey && e.keyCode == 85)) {
+        return false;
+    }
+};
+</script>
 
     <canvas id="bg-canvas"></canvas>
 
@@ -231,7 +239,7 @@
                         
                         <!-- NUEVO BOTÓN GENERADOR CÓDIGO -->
                         <div class="tooltip-container">
-                            <button class="btn-get-code" onclick="window.open('https://www.instagram.com/tu_cuenta_aqui', '_blank')">
+                            <button class="btn-get-code" onclick="window.open('https://www.instagram.com/protocolo.cruzmaya/', '_blank')">
                                 GENERAR CÓDIGO DE ACCESO
                             </button>
                             <span class="tooltiptext">1. Síguenos en Instagram<br>2. Comenta "CRUZ"<br>3. Recibirás tu código único</span>
@@ -311,6 +319,11 @@
         <div style="display: flex; gap: 30px;">
             <a href="index.html" style="color:white; opacity:0.3; text-decoration:none; font-family:var(--font-mono); font-size:0.65rem;">INICIO</a>
             <a href="mailto:protocolo.cruzmaya@gmail.com" style="color:white; opacity:0.3; text-decoration:none; font-family:var(--font-mono); font-size:0.65rem;">CONTACTO</a>
+            <a href="https://www.facebook.com/1037161592821744" target="_blank" style="color:white; opacity:0.5; font-size:1.2rem;"><i class="fab fa-facebook"></i></a>
+            <a href="https://www.instagram.com/protocolo.cruzmaya/" target="_blank" style="color:white; opacity:0.5; font-size:1.2rem;"><i class="fab fa-instagram"></i></a>
+            <a href="https://www.tiktok.com/@protocolocruzmaya" target="_blank" style="color:white; opacity:0.5; font-size:1.2rem;"><i class="fab fa-tiktok"></i></a>
+            <a href="https://www.youtube.com/@ProtocoloCruzMaya" target="_blank" style="color:white; opacity:0.5; font-size:1.2rem;"><i class="fab fa-youtube"></i></a>
+            <a href="https://x.com/X_cruz_maya" target="_blank" style="color:white; opacity:0.5; font-size:1.2rem;"><i class="fab fa-x-twitter"></i></a>
         </div>
     </footer>
 
