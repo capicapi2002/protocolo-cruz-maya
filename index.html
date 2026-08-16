@@ -253,10 +253,99 @@
         }
         .cruzmaya-f { font-family: var(--font-serif); font-size: 2.4rem; font-weight: 400; line-height: 1; }
 
+        /* ========================================================
+           REGLAS RESPONSIVAS (CORREGIDAS Y AMPLIADAS)
+           ======================================================== */
         @media (max-width: 850px) { 
-            .options-wrap { flex-direction: column; gap: 40px; }
-            .card:nth-child(n) { transform: translateY(0); }
+            /* Navegación: baja del top right a la parte superior, centrada */
+            nav.main-nav {
+                position: relative;
+                top: 0;
+                right: 0;
+                justify-content: center;
+                padding: 20px 0 0 0;
+                gap: 20px;
+                flex-wrap: wrap;
+            }
+            .header-main {
+                height: auto;
+                padding: 10px 0 20px 0;
+            }
+            .logo-main {
+                width: 180px;
+            }
+
+            /* Sección editorial */
+            .editorial-zone {
+                padding: 60px 15px;
+            }
+            .editorial-zone h2 {
+                font-size: 2.4rem;
+            }
+
+            /* CTA Strip: se apila verticalmente */
+            .cta-strip {
+                padding: 60px 0;
+            }
+            .cta-container {
+                flex-direction: column;
+                gap: 30px;
+                padding: 0 20px;
+                text-align: center;
+            }
+            .luna-tecnica {
+                width: 100px;
+                height: 100px;
+            }
+            .cta-text h3 {
+                font-size: 1.6rem;
+            }
+
+            /* Opciones/Tarjetas: se apilan en columna */
+            .options-wrap {
+                flex-direction: column;
+                align-items: center;
+                gap: 40px;
+                padding: 0 20px;
+                margin: 60px auto;
+            }
+            .card {
+                width: 100%;
+                max-width: 450px; /* Evita que ocupen todo el ancho excesivo en tablets */
+            }
+            .card:nth-child(n) { transform: translateY(0); } /* Anula el desplazamiento vertical de escritorio */
             .btn-get-code { font-size: 0.6rem; }
+
+            /* Footer: se apila y los enlaces se envuelven */
+            footer {
+                flex-direction: column;
+                gap: 40px;
+                padding: 40px 20px;
+                text-align: center;
+            }
+            footer > div:last-child {
+                flex-wrap: wrap !important;
+                justify-content: center !important;
+                gap: 15px !important;
+            }
+        }
+
+        /* Ajustes finos para móviles muy pequeños */
+        @media (max-width: 480px) {
+            .editorial-zone h2 {
+                font-size: 2rem;
+            }
+            .editorial-zone p {
+                font-size: 1rem;
+                padding: 0 10px;
+            }
+            .protocolo-f {
+                letter-spacing: 5px;
+                margin-right: -5px;
+            }
+            .cruzmaya-f {
+                font-size: 1.8rem;
+            }
         }
     </style>
 </head>
