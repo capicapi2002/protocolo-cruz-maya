@@ -20,7 +20,14 @@
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { background-color: var(--white); color: var(--black); font-family: 'Inter', sans-serif; overflow-x: hidden; }
+        
+        html, body {
+            width: 100%;
+            overflow-x: hidden;
+            background-color: var(--white);
+            color: var(--black);
+            font-family: 'Inter', sans-serif;
+        }
 
         #bg-canvas {
             position: fixed;
@@ -29,34 +36,58 @@
             background: radial-gradient(circle at center, #ffffff 0%, #e0e0e0 100%);
         }
 
-        /* --- NAVEGACIÓN SUPERIOR --- */
-        nav.main-nav {
-            position: absolute;
-            top: 40px; right: 50px;
-            display: flex; gap: 35px;
-            z-index: 100;
+        /* --- HEADER & NAVEGACIÓN RESPONSIVA --- */
+        header.header-wrapper {
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
         }
+
+        nav.main-nav {
+            display: flex;
+            gap: 30px;
+            z-index: 100;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
         nav.main-nav a {
             text-decoration: none;
             color: var(--black);
             font-family: var(--font-mono);
-            font-size: 0.65rem;
+            font-size: 0.75rem;
             letter-spacing: 2px;
             text-transform: uppercase;
-            opacity: 0.6;
+            opacity: 0.7;
+            transition: opacity 0.3s;
+        }
+
+        nav.main-nav a:hover {
+            opacity: 1;
         }
 
         .header-main {
-            height: 38vh;
             display: flex;
             justify-content: center;
             align-items: center;
+            padding: 20px 0;
         }
-        .logo-main { width: 230px; height: auto; }
+        .logo-main { 
+            width: 230px; 
+            max-width: 80vw;
+            height: auto; 
+        }
 
+        /* --- ZONA EDITORIAL --- */
         .editorial-zone {
             position: relative;
-            padding: 100px 20px;
+            padding: 80px 20px;
             text-align: center;
             border-top: 1px solid rgba(0,0,0,0.08);
             background: transparent;
@@ -70,14 +101,31 @@
             z-index: -1;
         }
 
-        .editorial-zone h2 { font-family: var(--font-serif); font-size: 3.2rem; font-weight: 400; margin-bottom: 30px; }
-        .editorial-zone h2 i { color: var(--accent); font-weight: 400; font-style: italic; }
-        .editorial-zone p { max-width: 780px; margin: 0 auto 25px auto; font-size: 1.1rem; line-height: 1.8; color: #1a1a1a; }
+        .editorial-content {
+            max-width: 900px;
+            margin: 0 auto;
+        }
 
+        .editorial-zone h2 { 
+            font-family: var(--font-serif); 
+            font-size: clamp(2rem, 4vw, 3.2rem); 
+            font-weight: 400; 
+            margin-bottom: 30px; 
+        }
+        .editorial-zone h2 i { color: var(--accent); font-weight: 400; font-style: italic; }
+        .editorial-zone p { 
+            max-width: 780px; 
+            margin: 0 auto 25px auto; 
+            font-size: clamp(0.95rem, 1.5vw, 1.1rem); 
+            line-height: 1.8; 
+            color: #1a1a1a; 
+        }
+
+        /* --- STRIP CTA --- */
         .cta-strip {
             background-color: var(--black);
             color: var(--white);
-            padding: 90px 0;
+            padding: 70px 20px;
             position: relative;
             overflow: hidden;
             z-index: 1;
@@ -88,28 +136,24 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 70px;
+            gap: 50px;
         }
         .luna-tecnica {
-            width: 150px;
-            height: 150px;
+            width: 140px;
+            height: 140px;
+            flex-shrink: 0;
             background: url('https://upload.wikimedia.org/wikipedia/commons/e/e1/FullMoon2010.jpg');
             background-size: cover;
             filter: grayscale(100%) brightness(1.2);
             border-radius: 50%;
         }
-        .tech-overlay {
-            position: absolute;
-            top: -30px; right: -30px;
-            width: 280px; height: 280px;
-            background: url('img/imagen 2.jpg');
-            background-size: contain;
-            background-repeat: no-repeat;
-            opacity: 0.15;
-            filter: invert(1);
-        }
 
-        .cta-text h3 { font-family: var(--font-serif); font-size: 2.1rem; margin-bottom: 30px; font-weight: 400; }
+        .cta-text h3 { 
+            font-family: var(--font-serif); 
+            font-size: clamp(1.4rem, 2.5vw, 2.1rem); 
+            margin-bottom: 30px; 
+            font-weight: 400; 
+        }
         
         .btn-saber {
             padding: 14px 40px;
@@ -119,42 +163,51 @@
             font-family: var(--font-mono);
             font-size: 0.75rem;
             letter-spacing: 2px;
+            display: inline-block;
+            transition: all 0.3s;
+        }
+        .btn-saber:hover {
+            background: var(--white);
+            color: var(--black);
         }
 
+        /* --- SECCIÓN TARJETAS / OPCIONES --- */
         .options-wrap {
             max-width: 1200px;
-            margin: 120px auto;
-            display: flex;
-            justify-content: space-between;
-            padding: 0 40px;
+            margin: 80px auto;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+            padding: 0 30px;
         }
         .card {
-            width: 31%;
-            padding: 50px 35px;
-            background: rgba(255,255,255,0.4);
-            border: 1px solid rgba(0,0,0,0.04);
+            width: 100%;
+            padding: 40px 30px;
+            background: rgba(255,255,255,0.6);
+            border: 1px solid rgba(0,0,0,0.06);
             backdrop-filter: blur(10px);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
         }
-        .card:nth-child(2) { transform: translateY(70px); }
-        .card:nth-child(3) { transform: translateY(-40px); }
 
         .img-tech {
             width: 100%;
-            height: 190px;
+            height: 180px;
             object-fit: contain;
-            margin-bottom: 30px;
+            margin-bottom: 25px;
             mix-blend-mode: multiply;
         }
 
-        .card h4 { font-family: var(--font-serif); font-size: 2rem; margin-bottom: 20px; font-weight: 400; }
-        .card ul { list-style: none; font-family: var(--font-mono); font-size: 0.7rem; color: #444; margin-bottom: 40px; }
+        .card h4 { font-family: var(--font-serif); font-size: 1.8rem; margin-bottom: 20px; font-weight: 400; }
+        .card ul { list-style: none; font-family: var(--font-mono); font-size: 0.75rem; color: #444; margin-bottom: 30px; }
         .card li { padding: 10px 0; border-bottom: 1px solid #eee; }
 
-        /* --- BLOQUE DE BOTONES ALINEADOS --- */
         .card-actions {
             display: flex;
             flex-direction: column;
-            gap: 0;
+            gap: 10px;
+            margin-top: auto;
         }
 
         .btn-buy {
@@ -162,20 +215,19 @@
             color: var(--white);
             display: block;
             text-align: center;
-            padding: 18px;
+            padding: 16px;
             text-decoration: none;
             font-family: var(--font-mono);
             font-size: 0.7rem;
             letter-spacing: 2px;
+            transition: background 0.3s;
         }
         .btn-buy:hover { background: var(--accent); }
 
-        /* --- ESTILOS BOTÓN GENERADOR CÓDIGO --- */
         .tooltip-container {
             position: relative;
             display: block;
             width: 100%;
-            margin-top: 2px;
         }
         .btn-get-code {
             background: transparent;
@@ -183,7 +235,7 @@
             border: 1px solid rgba(0,0,0,0.2);
             display: block;
             text-align: center;
-            padding: 18px 0;
+            padding: 16px 0;
             width: 100%;
             font-family: var(--font-mono);
             font-size: 0.7rem;
@@ -209,10 +261,9 @@
             z-index: 100;
             bottom: 115%;
             left: 50%;
-            margin-left: -110px;
+            transform: translateX(-50%);
             opacity: 0;
             transition: opacity 0.3s;
-            font-family: var(--font-sans);
             font-size: 0.75rem;
             line-height: 1.4;
             pointer-events: none;
@@ -232,119 +283,90 @@
             border-color: var(--black) transparent transparent transparent;
         }
 
+        /* --- FOOTER --- */
         footer {
             background-color: var(--black);
             color: var(--white);
-            padding: 60px 80px;
+            padding: 50px 40px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            max-width: 100%;
+            flex-wrap: wrap;
+            gap: 30px;
         }
         .footer-brand { display: flex; flex-direction: column; align-items: center; }
         .protocolo-f {
             font-family: var(--font-mono);
             font-size: 0.75rem;
-            letter-spacing: 12.8px;
+            letter-spacing: 10px;
             text-transform: uppercase;
             opacity: 0.5;
-            margin-right: -12.8px;
-            width: 100%;
             text-align: center;
         }
-        .cruzmaya-f { font-family: var(--font-serif); font-size: 2.4rem; font-weight: 400; line-height: 1; }
+        .cruzmaya-f { font-family: var(--font-serif); font-size: 2.2rem; font-weight: 400; line-height: 1; }
+
+        .footer-links {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .footer-links a {
+            color: white;
+            text-decoration: none;
+            font-family: var(--font-mono);
+            font-size: 0.65rem;
+        }
 
         /* ========================================================
-           REGLAS RESPONSIVAS (CORREGIDAS Y AMPLIADAS)
+           MEDIA QUERIES (TABLET, MOBILE & SMART TV)
            ======================================================== */
-        @media (max-width: 850px) { 
-            /* Navegación: baja del top right a la parte superior, centrada */
-            nav.main-nav {
-                position: relative;
-                top: 0;
-                right: 0;
-                justify-content: center;
-                padding: 20px 0 0 0;
-                gap: 20px;
-                flex-wrap: wrap;
-            }
-            .header-main {
-                height: auto;
-                padding: 10px 0 20px 0;
-            }
-            .logo-main {
-                width: 180px;
-            }
 
-            /* Sección editorial */
-            .editorial-zone {
-                padding: 60px 15px;
-            }
-            .editorial-zone h2 {
-                font-size: 2.4rem;
-            }
-
-            /* CTA Strip: se apila verticalmente */
-            .cta-strip {
-                padding: 60px 0;
+        /* Tablets / Pantallas medianas */
+        @media (max-width: 992px) {
+            .options-wrap {
+                grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             }
             .cta-container {
                 flex-direction: column;
-                gap: 30px;
-                padding: 0 20px;
                 text-align: center;
-            }
-            .luna-tecnica {
-                width: 100px;
-                height: 100px;
-            }
-            .cta-text h3 {
-                font-size: 1.6rem;
-            }
-
-            /* Opciones/Tarjetas: se apilan en columna */
-            .options-wrap {
-                flex-direction: column;
-                align-items: center;
-                gap: 40px;
-                padding: 0 20px;
-                margin: 60px auto;
-            }
-            .card {
-                width: 100%;
-                max-width: 450px; /* Evita que ocupen todo el ancho excesivo en tablets */
-            }
-            .card:nth-child(n) { transform: translateY(0); } /* Anula el desplazamiento vertical de escritorio */
-            .btn-get-code { font-size: 0.6rem; }
-
-            /* Footer: se apila y los enlaces se envuelven */
-            footer {
-                flex-direction: column;
-                gap: 40px;
-                padding: 40px 20px;
-                text-align: center;
-            }
-            footer > div:last-child {
-                flex-wrap: wrap !important;
-                justify-content: center !important;
-                gap: 15px !important;
             }
         }
 
-        /* Ajustes finos para móviles muy pequeños */
-        @media (max-width: 480px) {
-            .editorial-zone h2 {
-                font-size: 2rem;
+        /* Móviles */
+        @media (max-width: 768px) {
+            header.header-wrapper {
+                padding: 15px;
             }
-            .editorial-zone p {
-                font-size: 1rem;
-                padding: 0 10px;
+            nav.main-nav {
+                gap: 15px;
             }
-            .protocolo-f {
-                letter-spacing: 5px;
-                margin-right: -5px;
+            nav.main-nav a {
+                font-size: 0.65rem;
             }
-            .cruzmaya-f {
-                font-size: 1.8rem;
+            .options-wrap {
+                grid-template-columns: 1fr;
+                padding: 0 20px;
+                margin: 40px auto;
+            }
+            footer {
+                flex-direction: column;
+                text-align: center;
+                justify-content: center;
+            }
+            .footer-links {
+                justify-content: center;
+            }
+        }
+
+        /* Smart TVs & Pantallas ultra anchas */
+        @media (min-width: 1800px) {
+            body {
+                font-size: 1.2rem;
+            }
+            .options-wrap, .cta-container, header.header-wrapper {
+                max-width: 1600px;
             }
         }
     </style>
@@ -360,25 +382,27 @@ document.onkeydown = function(e) {
 
     <canvas id="bg-canvas"></canvas>
 
-    <nav class="main-nav">
-        <a href="about.html">Nosotros</a>
-        <a href="aprender.html">Aprende</a>
-        <a href="shop.html">Shop</a>
-        <a href="contacto.html">Contacto</a>
-    </nav>
-
-    <header class="header-main">
-        <img src="img/logo.png" alt="Protocolo Cruz Maya" class="logo-main">
+    <header class="header-wrapper">
+        <nav class="main-nav">
+            <a href="about.html">Nosotros</a>
+            <a href="aprender.html">Aprende</a>
+            <a href="shop.html">Shop</a>
+            <a href="contacto.html">Contacto</a>
+        </nav>
+        <div class="header-main">
+            <img src="img/logo.png" alt="Protocolo Cruz Maya" class="logo-main">
+        </div>
     </header>
 
     <section class="editorial-zone">
-        <h2>La Geometría de tu <i>Existencia</i></h2>
-        <p>No somos un oráculo; somos un laboratorio de decodificación. A través de la bioneuroemoción y el rigor del Calendario Sagrado, transformamos la incertidumbre en un <b>mapa estructural</b>.</p>
-        <p>Descubre por qué repites patrones y cómo el blindaje energético de tu Nahual puede rediseñar tu realidad física.</p>
+        <div class="editorial-content">
+            <h2>La Geometría de tu <i>Existencia</i></h2>
+            <p>No somos un oráculo; somos un laboratorio de decodificación. A través de la bioneuroemoción y el rigor del Calendario Sagrado, transformamos la incertidumbre en un <b>mapa estructural</b>.</p>
+            <p>Descubre por qué repites patrones y cómo el blindaje energético de tu Nahual puede rediseñar tu realidad física.</p>
+        </div>
     </section>
 
     <div class="cta-strip">
-        <div class="tech-overlay"></div>
         <div class="cta-container">
             <div class="luna-tecnica"></div>
             <div class="cta-text">
@@ -419,7 +443,9 @@ document.onkeydown = function(e) {
                 <li>Estrategia de Negocios</li>
                 <li>Propósito de Existencia</li>
             </ul>
-            <a href="analisis-individual.html" class="btn-buy" id="btn-precio-individual">AUDITORÍA — $15</a>
+            <div class="card-actions">
+                <a href="analisis-individual.html" class="btn-buy" id="btn-precio-individual">AUDITORÍA — $15</a>
+            </div>
         </div>
 
         <div class="card">
@@ -430,7 +456,9 @@ document.onkeydown = function(e) {
                 <li>Sinergia de Socios</li>
                 <li>Dinámica de 4 Cruces</li>
             </ul>
-            <a href="analisis-comparativo.html" class="btn-buy" id="btn-precio-comparativa">VER VÍNCULO — $18</a>
+            <div class="card-actions">
+                <a href="analisis-comparativo.html" class="btn-buy" id="btn-precio-comparativa">VER VÍNCULO — $18</a>
+            </div>
         </div>
     </main>
 
@@ -439,15 +467,15 @@ document.onkeydown = function(e) {
             <span class="protocolo-f">PROTOCOLO</span>
             <span class="cruzmaya-f">Cruz Maya</span>
         </div>
-        <div style="display: flex; gap: 30px;">
-            <a href="about.html" style="color:white; opacity:0.3; text-decoration:none; font-family:var(--font-mono); font-size:0.65rem;">NOSOTROS</a>
-            <a href="aprender.html" style="color:white; opacity:0.3; text-decoration:none; font-family:var(--font-mono); font-size:0.65rem;">APRENDE</a>
-            <a href="contacto.html" style="color:white; opacity:0.3; text-decoration:none; font-family:var(--font-mono); font-size:0.65rem;">CONTACTO</a>
-            <a href="https://www.facebook.com/1037161592821744" target="_blank" style="color:white; opacity:0.5; font-size:1.2rem;"><i class="fab fa-facebook"></i></a>
-            <a href="https://www.instagram.com/protocolo.cruzmaya/" target="_blank" style="color:white; opacity:0.5; font-size:1.2rem;"><i class="fab fa-instagram"></i></a>
-            <a href="https://www.tiktok.com/@protocolocruzmaya" target="_blank" style="color:white; opacity:0.5; font-size:1.2rem;"><i class="fab fa-tiktok"></i></a>
-            <a href="https://www.youtube.com/@ProtocoloCruzMaya" target="_blank" style="color:white; opacity:0.5; font-size:1.2rem;"><i class="fab fa-youtube"></i></a>
-            <a href="https://x.com/X_cruz_maya" target="_blank" style="color:white; opacity:0.5; font-size:1.2rem;"><i class="fab fa-x-twitter"></i></a>
+        <div class="footer-links">
+            <a href="about.html" style="opacity:0.5;">NOSOTROS</a>
+            <a href="aprender.html" style="opacity:0.5;">APRENDE</a>
+            <a href="contacto.html" style="opacity:0.5;">CONTACTO</a>
+            <a href="https://www.facebook.com/1037161592821744" target="_blank" style="opacity:0.7; font-size:1.1rem;"><i class="fab fa-facebook"></i></a>
+            <a href="https://www.instagram.com/protocolo.cruzmaya/" target="_blank" style="opacity:0.7; font-size:1.1rem;"><i class="fab fa-instagram"></i></a>
+            <a href="https://www.tiktok.com/@protocolocruzmaya" target="_blank" style="opacity:0.7; font-size:1.1rem;"><i class="fab fa-tiktok"></i></a>
+            <a href="https://www.youtube.com/@ProtocoloCruzMaya" target="_blank" style="opacity:0.7; font-size:1.1rem;"><i class="fab fa-youtube"></i></a>
+            <a href="https://x.com/X_cruz_maya" target="_blank" style="opacity:0.7; font-size:1.1rem;"><i class="fab fa-x-twitter"></i></a>
         </div>
     </footer>
 

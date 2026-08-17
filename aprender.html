@@ -191,6 +191,21 @@
         .protocolo-f { font-family: var(--font-mono); font-size: 0.6rem; letter-spacing: 10px; text-transform: uppercase; opacity: 0.5; }
         .cruzmaya-f { font-family: var(--font-serif); font-size: 2rem; font-weight: 400; }
 
+        @media (max-width: 1050px) {
+            nav.main-nav {
+                position: relative;
+                top: 0; right: 0;
+                justify-content: center;
+                padding: 25px 20px 10px 20px;
+                gap: 20px;
+                flex-wrap: wrap;
+            }
+            header {
+                height: auto;
+                padding: 20px 0;
+            }
+        }
+
         @media (max-width: 850px) {
             .grid-tech { grid-template-columns: 1fr; }
             .tech-section { padding: 40px 25px; }

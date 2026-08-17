@@ -109,9 +109,21 @@
         .protocolo-f { font-family: var(--font-mono); font-size: 0.6rem; letter-spacing: 10px; text-transform: uppercase; opacity: 0.5; }
         .cruzmaya-f { font-family: var(--font-serif); font-size: 2rem; font-weight: 400; }
         
+        @media (max-width: 1050px) {
+            nav.main-nav {
+                position: relative;
+                top: 0; right: 0;
+                justify-content: center;
+                padding: 25px 20px 10px 20px;
+                gap: 20px;
+                flex-wrap: wrap;
+            }
+            header { padding: 20px 0; }
+        }
+
         @media (max-width: 850px) {
             footer { flex-direction: column; gap: 20px; padding: 30px; }
-            header { padding: 30px 0; } .date-grid { grid-template-columns: 1fr; }
+            .date-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
